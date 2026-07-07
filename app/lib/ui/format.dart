@@ -10,7 +10,9 @@ String relativeTime(DateTime sentAt, DateTime now) {
   if (age.inSeconds < 60) return 'just now';
   if (age.inMinutes < 60) return '${age.inMinutes} min ago';
   if (age.inHours < 24) return '${age.inHours} h ago';
-  return DateFormat.MMMd().add_jm().format(sentAt);
+  // Explicit pattern: MMMd().add_jm() joins with a bare space ("May 28 3:40
+  // PM"); the spec (dev/requirements §10.4) wants the conventional comma.
+  return DateFormat('MMM d, h:mm a').format(sentAt);
 }
 
 /// "you" on own messages, otherwise how far away the message was sent.

@@ -3,6 +3,7 @@
     "spec-driven-product",
     "executable-requirements",
     "flutter",
+    "firebase",
     "node"
   ],
   "rules": {},

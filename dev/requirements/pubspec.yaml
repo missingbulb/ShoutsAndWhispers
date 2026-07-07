@@ -12,6 +12,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Direct import in behavior cases (map camera assertions); version is
+  # pinned by the app package's resolution.
+  flutter_map: ^8.3.1
   shouts_and_whispers:
     path: ../../app
 

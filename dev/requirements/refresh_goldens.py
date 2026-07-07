@@ -27,7 +27,10 @@ if __name__ == "__main__":
     )
     if rc != 0:
         sys.exit(rc)
-    flutter = flutter_test_runner.find_flutter()
-    dart = os.path.join(os.path.dirname(flutter), "dart")
-    subprocess.run([dart, "run", "tool/build_gallery.dart"], check=True)
+    env = dict(os.environ, REQ_UPDATE_GALLERY="1")
+    subprocess.run(
+        [flutter_test_runner.find_flutter(), "test", "test/gallery_gate_test.dart"],
+        check=True,
+        env=env,
+    )
     print("Goldens and gallery regenerated.")

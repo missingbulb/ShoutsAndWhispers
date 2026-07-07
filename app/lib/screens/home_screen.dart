@@ -152,8 +152,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: StreamBuilder<List<FeedMessage>>(
         stream: _feed,
         builder: (context, snapshot) {
+          // The port promises newest-first, but sort defensively: server
+          // latency compensation can momentarily stamp a just-sent message
+          // with a local fallback time, and the feed must never visibly
+          // reorder because of it.
           final List<FeedMessage> messages =
-              snapshot.data ?? const <FeedMessage>[];
+              List.of(snapshot.data ?? const <FeedMessage>[])
+                ..sort((a, b) => b.sentAt.compareTo(a.sentAt));
           // Size the feed off the body's actual constraints, not the full
           // screen height: the body shrinks when the soft keyboard opens
           // (resizeToAvoidBottomInset), and a fixed 35%-of-screen feed plus
