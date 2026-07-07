@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
-import '../services/auth_service.dart';
+import '../ports/ports.dart';
 
 /// App name, one-line pitch, and the Google sign-in button.
 class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key, required this.authService});
+  const SignInScreen({super.key, required this.auth});
 
-  final AuthService authService;
+  final AuthPort auth;
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
@@ -23,14 +22,12 @@ class _SignInScreenState extends State<SignInScreen> {
       _error = null;
     });
     try {
-      await widget.authService.signInWithGoogle();
+      await widget.auth.signInWithGoogle();
       // Success: the auth-gate StreamBuilder swaps this screen out.
-    } on GoogleSignInException catch (e) {
-      setState(() {
-        _error = e.code == GoogleSignInExceptionCode.canceled
-            ? null // User backed out — not an error worth shouting about.
-            : 'Google sign-in failed: ${e.description ?? e.code.name}';
-      });
+    } on SignInCanceledException {
+      // User backed out — not an error worth shouting about.
+    } on SignInException catch (e) {
+      setState(() => _error = e.message);
     } catch (e) {
       setState(() => _error = 'Sign-in failed: $e');
     } finally {

@@ -243,13 +243,25 @@ Deliberately rudimentary UI, as agreed: one sign-in screen, one home screen.
 ## 9. Repository layout
 
 ```
-app/                    Flutter client
+app/                    Flutter client (ports/adapters — UI-ARCHITECTURE.md)
 functions/              Cloud Functions (TypeScript, Node 22)
+dev/requirements/       executable UI requirements (spec + cases + goldens)
 firestore.rules         security rules
 firestore.indexes.json  (empty — single-field indexes suffice)
 firebase.json           Firebase project config
-docs/DESIGN.md          this document
+.firebaserc             project aliases (committed default = dev — ENVIRONMENTS.md)
+docs/                   this document, UI-ARCHITECTURE.md, ENVIRONMENTS.md
 ```
+
+The UI is fully decoupled from phone and server behind injected ports
+([UI-ARCHITECTURE.md](UI-ARCHITECTURE.md)), which is what makes the UI spec
+executable: every §6 surface, state, and user saga is rendered and asserted
+against scripted fakes in `dev/requirements/` — the spec document itself
+([../dev/requirements/requirements.md](../dev/requirements/requirements.md))
+embeds the rendered screenshots. Environments are dev-first
+([ENVIRONMENTS.md](ENVIRONMENTS.md)): the committed default is the dev
+project; production is created at the release milestone and gated by App
+Check so only store-installed apps reach it.
 
 ## 10. Constants (single source of truth)
 

@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
-
 /// The two message ranges (docs/DESIGN.md §1).
 enum MessageKind {
   /// 1,500 m radius — the whole neighborhood.
@@ -42,13 +40,21 @@ class FeedMessage {
     required this.isOwn,
   });
 
-  /// Builds a [FeedMessage] from a Firestore feed document.
+  /// Builds a [FeedMessage] from a feed document's data.
+  ///
+  /// Platform-free: `sentAt` must already be a plain [DateTime] — the
+  /// Firestore `Timestamp` → [DateTime] conversion happens in the messages
+  /// adapter, not here.
   ///
   /// Defensive about missing/mistyped fields: the server writes `sentAt` as a
   /// Firestore server timestamp, so during latency compensation a snapshot
-  /// can momentarily carry `sentAt: null` — that falls back to "now", which
+  /// can momentarily carry `sentAt: null` — that falls back to [now], which
   /// is within clock skew of what the server will stamp.
-  factory FeedMessage.fromMap(String id, Map<String, dynamic> data) {
+  factory FeedMessage.fromMap(
+    String id,
+    Map<String, dynamic> data, {
+    DateTime Function() now = DateTime.now,
+  }) {
     return FeedMessage(
       messageId: _string(data['messageId']) ?? id,
       senderId: _string(data['senderId']) ?? '',
@@ -58,7 +64,7 @@ class FeedMessage {
       kind: MessageKind.fromWire(data['kind']),
       lat: _double(data['lat']) ?? 0,
       lng: _double(data['lng']) ?? 0,
-      sentAt: _dateTime(data['sentAt']) ?? DateTime.now(),
+      sentAt: _dateTime(data['sentAt']) ?? now(),
       distanceM: _double(data['distanceM']) ?? 0,
       isOwn: data['isOwn'] == true,
     );
@@ -90,9 +96,6 @@ class FeedMessage {
   static double? _double(Object? value) =>
       value is num ? value.toDouble() : null;
 
-  static DateTime? _dateTime(Object? value) {
-    if (value is Timestamp) return value.toDate();
-    if (value is DateTime) return value;
-    return null;
-  }
+  static DateTime? _dateTime(Object? value) =>
+      value is DateTime ? value : null;
 }

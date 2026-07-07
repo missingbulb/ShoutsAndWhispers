@@ -1,6 +1,9 @@
 {
   "packs": [
-    "spec-driven-product"
+    "spec-driven-product",
+    "executable-requirements",
+    "flutter",
+    "node"
   ],
   "rules": {},
   "accept": []

@@ -1,32 +1,33 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../config.dart';
 import '../models/feed_message.dart';
-import '../services/auth_service.dart';
-import '../services/location_service.dart';
-import '../services/message_service.dart';
-import '../services/push_service.dart';
+import '../ports/ports.dart';
+import '../ui/format.dart';
 
 /// The single main screen: map on top, feed + composer below
 /// (docs/DESIGN.md §6 — deliberately rudimentary).
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
-    required this.authService,
-    required this.locationService,
-    required this.pushService,
-    required this.messageService,
+    required this.auth,
+    required this.location,
+    required this.push,
+    required this.messages,
+    required this.clock,
+    this.tileProviderBuilder,
   });
 
-  final AuthService authService;
-  final LocationService locationService;
-  final PushService pushService;
-  final MessageService messageService;
+  final AuthPort auth;
+  final LocationPort location;
+  final PushPort push;
+  final MessagesPort messages;
+  final Clock clock;
+
+  /// Map tile source override; null keeps the default network tiles.
+  final TileProvider Function()? tileProviderBuilder;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -43,52 +44,51 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _feed = widget.messageService.feedStream();
-    widget.locationService.position.addListener(_maybeCenterOnFirstFix);
-    widget.locationService.start();
-    widget.pushService.init();
+    _feed = widget.messages.feed();
+    widget.location.position.addListener(_maybeCenterOnFirstFix);
+    widget.location.start();
+    widget.push.init();
   }
 
   @override
   void dispose() {
-    widget.locationService.position.removeListener(_maybeCenterOnFirstFix);
-    widget.locationService.stop();
-    widget.pushService.stop();
+    widget.location.position.removeListener(_maybeCenterOnFirstFix);
+    widget.location.stop();
+    widget.push.stop();
     _textController.dispose();
     _mapController.dispose();
     super.dispose();
   }
 
   void _maybeCenterOnFirstFix() {
-    final p = widget.locationService.position.value;
+    final p = widget.location.position.value;
     if (p == null || _centeredOnFix) return;
     _centeredOnFix = true;
     try {
-      _mapController.move(LatLng(p.latitude, p.longitude), 15);
+      _mapController.move(LatLng(p.lat, p.lng), 15);
     } catch (e) {
       debugPrint('Could not center map: $e');
     }
   }
 
   Future<void> _send() async {
-    final Position? p = widget.locationService.position.value;
+    final GeoPosition? p = widget.location.position.value;
     final String text = _textController.text.trim();
     if (p == null || text.isEmpty || _sending) return;
 
     setState(() => _sending = true);
     try {
-      final result = await widget.messageService.sendMessage(
+      final result = await widget.messages.send(
         text: text,
         kind: _kind,
-        lat: p.latitude,
-        lng: p.longitude,
+        at: p,
       );
       if (!mounted) return;
       _textController.clear();
       _showSnack('Delivered to ${result.recipientCount} people nearby');
-    } on FirebaseFunctionsException catch (e) {
+    } on SendException catch (e) {
       if (!mounted) return;
-      _showSnack('Send failed: ${e.message ?? e.code}');
+      _showSnack('Send failed: ${e.message}');
     } catch (e) {
       if (!mounted) return;
       _showSnack('Send failed: $e');
@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     if (confirmed != true) return;
     try {
-      await widget.messageService.deleteFeedEntry(message.messageId);
+      await widget.messages.deleteFeedEntry(message.messageId);
     } catch (e) {
       if (!mounted) return;
       _showSnack('Delete failed: $e');
@@ -136,21 +136,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ? Colors.deepOrange
       : Colors.indigo;
 
-  static String _relativeTime(DateTime sentAt) {
-    final Duration age = DateTime.now().difference(sentAt);
-    if (age.inSeconds < 60) return 'just now';
-    if (age.inMinutes < 60) return '${age.inMinutes} min ago';
-    if (age.inHours < 24) return '${age.inHours} h ago';
-    return DateFormat.MMMd().add_jm().format(sentAt);
-  }
-
-  static String _distanceLabel(FeedMessage message) {
-    if (message.isOwn) return 'you';
-    final double d = message.distanceM;
-    if (d < 1000) return '${d.round()} m away';
-    return '${(d / 1000).toStringAsFixed(1)} km away';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             tooltip: 'Sign out',
             icon: const Icon(Icons.logout),
-            onPressed: widget.authService.signOut,
+            onPressed: widget.auth.signOut,
           ),
         ],
       ),
@@ -199,8 +184,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMap(List<FeedMessage> messages) {
-    return ValueListenableBuilder<Position?>(
-      valueListenable: widget.locationService.position,
+    return ValueListenableBuilder<GeoPosition?>(
+      valueListenable: widget.location.position,
       builder: (context, position, _) {
         final markers = <Marker>[
           for (final m in messages)
@@ -216,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           if (position != null)
             Marker(
-              point: LatLng(position.latitude, position.longitude),
+              point: LatLng(position.lat, position.lng),
               width: 20,
               height: 20,
               child: Container(
@@ -232,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
           mapController: _mapController,
           options: MapOptions(
             initialCenter: position != null
-                ? LatLng(position.latitude, position.longitude)
+                ? LatLng(position.lat, position.lng)
                 : const LatLng(0, 0),
             initialZoom: position != null ? 15 : 2,
           ),
@@ -240,6 +225,9 @@ class _HomeScreenState extends State<HomeScreen> {
             TileLayer(
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.shoutsandwhispers.app',
+              // Null keeps flutter_map's default network provider, exactly
+              // as before; tests inject a deterministic in-memory provider.
+              tileProvider: widget.tileProviderBuilder?.call(),
             ),
             MarkerLayer(markers: markers),
           ],
@@ -250,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildLocationErrorBanner() {
     return ValueListenableBuilder<String?>(
-      valueListenable: widget.locationService.error,
+      valueListenable: widget.location.error,
       builder: (context, error, _) {
         if (error == null) return const SizedBox.shrink();
         final theme = Theme.of(context);
@@ -271,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 TextButton(
-                  onPressed: widget.locationService.start,
+                  onPressed: widget.location.start,
                   child: const Text('Retry'),
                 ),
               ],
@@ -331,7 +319,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(m.text),
               const SizedBox(height: 2),
               Text(
-                '${_relativeTime(m.sentAt)} · ${_distanceLabel(m)}',
+                '${relativeTime(m.sentAt, widget.clock.now())} · '
+                '${distanceLabel(m)}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -409,14 +398,14 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 4),
             ListenableBuilder(
               listenable: Listenable.merge(
-                [_textController, widget.locationService.position],
+                [_textController, widget.location.position],
               ),
               builder: (context, _) {
                 final bool canSend = !_sending &&
-                    widget.locationService.position.value != null &&
+                    widget.location.position.value != null &&
                     _textController.text.trim().isNotEmpty;
                 return IconButton.filled(
-                  tooltip: widget.locationService.position.value == null
+                  tooltip: widget.location.position.value == null
                       ? 'Waiting for a GPS fix…'
                       : 'Send',
                   icon: _sending

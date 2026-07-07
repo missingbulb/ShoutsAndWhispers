@@ -7,17 +7,22 @@ who arrives later. Every recipient keeps a durable personal feed of everything
 they received, even while the app was in their pocket.
 
 The full design (data model, fan-out architecture, security rules, threat
-model) is in [docs/DESIGN.md](docs/DESIGN.md).
+model) is in [docs/DESIGN.md](docs/DESIGN.md). The UI's
+dependency-injection architecture is
+[docs/UI-ARCHITECTURE.md](docs/UI-ARCHITECTURE.md); the dev/prod
+environment plan is [docs/ENVIRONMENTS.md](docs/ENVIRONMENTS.md).
 
 ## Repository layout
 
 ```
-app/                    Flutter client
+app/                    Flutter client (ports/adapters — see docs/UI-ARCHITECTURE.md)
 functions/              Cloud Functions (TypeScript, Node 22)
+dev/requirements/       executable UI requirements: spec, cases, goldens, runners
 firestore.rules         Firestore security rules
 firestore.indexes.json  Firestore indexes (empty — single-field indexes suffice)
 firebase.json           Firebase project config
-docs/DESIGN.md          design document
+.firebaserc             project aliases (committed default = dev, always)
+docs/                   design, UI architecture, environments
 ```
 
 ## Prerequisites
@@ -30,8 +35,16 @@ docs/DESIGN.md          design document
 
 ## Firebase setup
 
-1. **Create a Firebase project** at <https://console.firebase.google.com>
-   and upgrade it to the Blaze plan.
+Everything below targets the **dev** project — the committed default in
+`.firebaserc`. Production doesn't exist yet and nothing in this repo will
+ever point at it by accident; the plan for the split (and why only
+store-installed apps will talk to prod) is
+[docs/ENVIRONMENTS.md](docs/ENVIRONMENTS.md).
+
+1. **Create the dev Firebase project** at
+   <https://console.firebase.google.com> (suggested id:
+   `shouts-whispers-dev` — update `.firebaserc` if you pick another) and
+   upgrade it to the Blaze plan.
 
 2. **Enable Google sign-in**: in the console, Authentication → Sign-in
    method → add **Google** as a provider.
@@ -96,6 +109,21 @@ Flutter app (`app/`):
 flutter analyze
 flutter test
 ```
+
+Executable UI requirements (`dev/requirements/` — the UI spec run as tests;
+see its [README](dev/requirements/README.md)):
+
+```sh
+cd dev/requirements
+flutter pub get                # first time
+flutter test                   # coverage gate + screens + sagas + behaviors + logic
+python3 refresh_goldens.py     # regenerate goldens + gallery (review step!)
+```
+
+Every screen state, gesture, and multi-step user saga renders and asserts
+against scripted fakes — no device, no Firebase project, no network. The
+spec ([dev/requirements/requirements.md](dev/requirements/requirements.md))
+embeds the rendered screenshots inline, so reading it is reviewing the app.
 
 ## Current limitations (v1)
 

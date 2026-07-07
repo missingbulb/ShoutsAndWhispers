@@ -1,6 +1,5 @@
-// Pure-Dart model tests — no Firebase initialization required (Timestamp is
-// a plain value class).
-import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
+// Pure-Dart model tests — no Firebase types anywhere (the Firestore
+// Timestamp -> DateTime conversion happens in the messages adapter).
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shouts_and_whispers/models/feed_message.dart';
 
@@ -17,7 +16,7 @@ void main() {
         'kind': 'whisper',
         'lat': 57.64911,
         'lng': 10.40744,
-        'sentAt': Timestamp.fromDate(sentAt),
+        'sentAt': sentAt,
         'distanceM': 320,
         'isOwn': false,
       });
@@ -30,8 +29,7 @@ void main() {
       expect(message.kind, MessageKind.whisper);
       expect(message.lat, 57.64911);
       expect(message.lng, 10.40744);
-      // Timestamp.toDate() yields a local-zone DateTime; compare instants.
-      expect(message.sentAt.toUtc(), sentAt);
+      expect(message.sentAt, sentAt);
       expect(message.distanceM, 320.0);
       expect(message.isOwn, false);
     });
@@ -46,28 +44,28 @@ void main() {
     });
 
     test('tolerates missing senderPhotoUrl and null sentAt', () {
-      final before = DateTime.now();
-      final message = FeedMessage.fromMap('msg-3', <String, dynamic>{
-        'messageId': 'msg-3',
-        'senderId': 'uid-7',
-        'senderName': 'Grace Hopper',
-        // no senderPhotoUrl at all
-        'text': 'hello',
-        'kind': 'shout',
-        'lat': 1.0,
-        'lng': 2.0,
-        'sentAt': null, // latency compensation: serverTimestamp still pending
-        'distanceM': 0,
-        'isOwn': true,
-      });
-      final after = DateTime.now();
+      final fallbackNow = DateTime(2026, 6, 1, 12, 0);
+      final message = FeedMessage.fromMap(
+        'msg-3',
+        <String, dynamic>{
+          'messageId': 'msg-3',
+          'senderId': 'uid-7',
+          'senderName': 'Grace Hopper',
+          // no senderPhotoUrl at all
+          'text': 'hello',
+          'kind': 'shout',
+          'lat': 1.0,
+          'lng': 2.0,
+          'sentAt': null, // latency compensation: serverTimestamp still pending
+          'distanceM': 0,
+          'isOwn': true,
+        },
+        now: () => fallbackNow,
+      );
 
       expect(message.senderPhotoUrl, isNull);
-      // Null sentAt falls back to "now".
-      expect(
-        message.sentAt.isBefore(before) || message.sentAt.isAfter(after),
-        isFalse,
-      );
+      // Null sentAt falls back to the injected "now".
+      expect(message.sentAt, fallbackNow);
     });
 
     test('tolerates an entirely empty map', () {
@@ -99,6 +97,7 @@ void main() {
       final message = FeedMessage.fromMap('msg-6', <String, dynamic>{
         'senderName': 12345, // not a string
         'lat': 'not-a-number',
+        'sentAt': 'not-a-date', // mistyped sentAt also falls back to now
         'distanceM': 12, // int, not double
         'isOwn': 'yes', // not a bool
       });

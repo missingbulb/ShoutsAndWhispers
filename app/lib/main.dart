@@ -1,14 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'adapters/fcm_push_adapter.dart';
+import 'adapters/firebase_auth_adapter.dart';
+import 'adapters/firebase_messages_adapter.dart';
+import 'adapters/geolocator_location_adapter.dart';
+import 'app.dart';
 import 'firebase_options.dart';
-import 'screens/home_screen.dart';
-import 'screens/sign_in_screen.dart';
-import 'services/auth_service.dart';
-import 'services/location_service.dart';
-import 'services/message_service.dart';
-import 'services/push_service.dart';
+import 'ports/ports.dart';
+import 'screens/setup_required_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,88 +38,15 @@ Future<void> main() async {
     return;
   }
 
-  runApp(const ShoutsAndWhispersApp());
-}
-
-/// Full-screen setup instructions shown when Firebase isn't configured yet.
-class SetupRequiredApp extends StatelessWidget {
-  const SetupRequiredApp({super.key, required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Shouts & Whispers — setup required',
-      theme: ThemeData(colorSchemeSeed: Colors.indigo),
-      home: Scaffold(
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.build_circle_outlined, size: 64),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Setup required',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 16),
-                  SelectableText(message, textAlign: TextAlign.left),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Root app: builds the services once and gates on auth state.
-class ShoutsAndWhispersApp extends StatefulWidget {
-  const ShoutsAndWhispersApp({super.key});
-
-  @override
-  State<ShoutsAndWhispersApp> createState() => _ShoutsAndWhispersAppState();
-}
-
-class _ShoutsAndWhispersAppState extends State<ShoutsAndWhispersApp> {
-  final AuthService _authService = AuthService();
-  final LocationService _locationService = LocationService();
-  final PushService _pushService = PushService();
-  final MessageService _messageService = MessageService();
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Shouts & Whispers',
-      theme: ThemeData(colorSchemeSeed: Colors.indigo),
-      home: StreamBuilder<User?>(
-        stream: _authService.authStateChanges,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
-          final User? user = snapshot.data;
-          if (user == null) {
-            return SignInScreen(authService: _authService);
-          }
-          // Keyed by uid so a different account gets a fresh screen state
-          // (feed stream, map position, composer).
-          return HomeScreen(
-            key: ValueKey(user.uid),
-            authService: _authService,
-            locationService: _locationService,
-            pushService: _pushService,
-            messageService: _messageService,
-          );
-        },
-      ),
-    );
-  }
+  // The only place adapters are constructed (docs/UI-ARCHITECTURE.md): the
+  // shared shell gets the production ports here; tests hand it fakes.
+  runApp(
+    ShoutsAndWhispersShell(
+      auth: FirebaseAuthAdapter(),
+      location: GeolocatorLocationAdapter(),
+      push: FcmPushAdapter(),
+      messages: FirebaseMessagesAdapter(),
+      clock: const SystemClock(),
+    ),
+  );
 }
