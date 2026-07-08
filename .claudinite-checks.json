@@ -1,7 +1,9 @@
 {
   "packs": [
     "spec-driven-product",
+    "executable-requirements",
     "flutter",
+    "firebase",
     "node"
   ],
   "rules": {},
@@ -9,7 +11,7 @@
     {
       "rule": "pack-declaration",
       "path": ".claudinite-checks.json",
-      "reason": "flutter and node genuinely apply here but the pack fingerprints look for a repo-root pubspec.yaml / package.json, while this monorepo keeps them in app/ and functions/ — so detect() can't see them and the declaration is deliberately ahead of the root-only fingerprint. (executable-requirements and firebase are intentionally NOT declared yet: they don't exist in the mounted corpus until the Claudinite pack PR merges and .claudinite/ re-syncs, at which point they fingerprint-match on dev/requirements/requirements.md and firebase.json and need no acceptance.)"
+      "reason": "flutter and node genuinely apply here but the pack fingerprints look for a repo-root pubspec.yaml / package.json, while this monorepo keeps them in app/ and functions/ — so detect() can't see them and the declaration is deliberately ahead of the root-only fingerprint. (executable-requirements and firebase need no acceptance: they fingerprint-match on dev/requirements/requirements.md and firebase.json.)"
     }
   ]
 }
