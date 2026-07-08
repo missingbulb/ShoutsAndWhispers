@@ -1,0 +1,35 @@
+name: requirements
+description: >-
+  Executable UI requirements for Shouts & Whispers — the runners, cases, and
+  goldens behind dev/requirements/requirements.md. Not published; run with
+  `flutter test` from this directory.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Direct import in behavior cases (map camera assertions); version is
+  # pinned by the app package's resolution.
+  flutter_map: ^8.3.1
+  shouts_and_whispers:
+    path: ../../app
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: shared/fonts/Roboto-Regular.ttf
+        - asset: shared/fonts/Roboto-Medium.ttf
+          weight: 500
+        - asset: shared/fonts/Roboto-Bold.ttf
+          weight: 700

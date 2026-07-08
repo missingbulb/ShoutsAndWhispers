@@ -1,3 +1,10 @@
 /.claudinite/*
 !/.claudinite/.gitkeep
 /.claudinite.new/
+
+# Firebase backend
+functions/node_modules/
+functions/lib/
+.firebase/
+firebase-debug*.log
+*.log

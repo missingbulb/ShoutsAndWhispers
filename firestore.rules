@@ -1,0 +1,101 @@
+rules_version = '2';
+
+// Shouts & Whispers — DESIGN.md §5.
+//
+//   presence/{uid}:        read: never (functions only)
+//                          write: only owner, shape-validated,
+//                                 updatedAt pinned to request.time whenever the
+//                                 client writes position or updatedAt,
+//                                 lastSentAt is server-owned (never client-writable)
+//   messages/**:           no client access
+//   users/{uid}/feed/{id}: read, delete: owner only; create/update: never
+//   everything else:       deny
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // The fields a client is allowed to write on its own presence doc.
+    // lastSentAt is deliberately absent: it is server-owned (rate limiting).
+    function presenceClientFields() {
+      return ['lat', 'lng', 'geohash', 'updatedAt', 'fcmToken'];
+    }
+
+    // The positional heartbeat fields — written together or not at all.
+    function presencePositionFields() {
+      return ['lat', 'lng', 'geohash', 'updatedAt'];
+    }
+
+    // Shape validation of the (merged) presence document. Every check guards
+    // for key absence: the two client writers upsert disjoint field sets
+    // (LocationService's heartbeat writes lat/lng/geohash/updatedAt,
+    // PushService writes only fcmToken) and the server's send-time refresh
+    // writes no fcmToken key at all, so a legitimate merged doc may lack any
+    // of these keys. An unguarded access to a missing key would raise an
+    // error and deny the write.
+    function validPresenceData(d) {
+      return (!('lat' in d) || (d.lat is number && d.lat >= -90 && d.lat <= 90))
+          && (!('lng' in d) || (d.lng is number && d.lng >= -180 && d.lng <= 180))
+          && (!('geohash' in d)
+              || (d.geohash is string && d.geohash.size() >= 1 && d.geohash.size() <= 12))
+          && (!('fcmToken' in d)
+              || d.fcmToken == null
+              || (d.fcmToken is string && d.fcmToken.size() <= 4096));
+    }
+
+    // Any client write that touches position (or updatedAt itself) must stamp
+    // updatedAt with request.time (FieldValue.serverTimestamp()): a client can
+    // neither forge a heartbeat time nor move position while keeping a stale
+    // one. fcmToken-only writes leave updatedAt untouched.
+    function presenceTimePinned(writtenKeys) {
+      return !writtenKeys.hasAny(presencePositionFields())
+          || request.resource.data.updatedAt == request.time;
+    }
+
+    match /presence/{uid} {
+      // Positions are visible to Cloud Functions only — the privacy boundary.
+      allow read: if false;
+
+      // Create (clients use set(merge: true); on a nonexistent doc that is a
+      // create containing exactly the written fields): either a heartbeat
+      // ({lat,lng,geohash,updatedAt}, optionally with fcmToken) or an
+      // fcmToken-only write from PushService — whichever lands first.
+      allow create: if request.auth != null
+          && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(presenceClientFields())
+          && (!request.resource.data.keys().hasAny(presencePositionFields())
+              || request.resource.data.keys().hasAll(presencePositionFields()))
+          && validPresenceData(request.resource.data)
+          && presenceTimePinned(request.resource.data.keys());
+
+      // Update (set(merge: true) on an existing doc): the client may only
+      // touch its own fields — diff() means it can never write lastSentAt —
+      // and the merged result must still be well-formed.
+      allow update: if request.auth != null
+          && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(presenceClientFields())
+          && validPresenceData(request.resource.data)
+          && presenceTimePinned(
+              request.resource.data.diff(resource.data).affectedKeys());
+
+      allow delete: if false;
+    }
+
+    // Canonical message archive: no client access, ever.
+    match /messages/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Per-user inbox: the owner may read and delete their copies;
+    // only Cloud Functions create them.
+    match /users/{uid}/feed/{messageId} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if false;
+    }
+
+    // Default deny everything else.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

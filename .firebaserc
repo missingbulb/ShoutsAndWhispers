@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "shouts-whispers-dev",
+    "dev": "shouts-whispers-dev"
+  }
+}

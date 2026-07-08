@@ -1,0 +1,11 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "**/*.png"
+
+linter:
+  rules:
+    # Case files are named `<slug>.<leaf-id>.case.dart` by framework
+    # convention — the leaf id in the name IS the link to the spec.
+    file_names: false
