@@ -13,7 +13,7 @@
     {
       "rule": "pack-declaration",
       "path": ".claudinite-checks.json",
-      "reason": "node and firebase genuinely apply but their packs' near-root fingerprints (marker at the repo root or one directory down) don't reach them under this repo's nested Firebase layout: node's package.json is at firebase/functions/package.json (two directories down, past node's intentional near-root cap that keeps nested fixtures from tripping it), and firebase.json is at firebase/firebase.json (one down) — which the exact-root firebase fingerprint on main can't see. Once Claudinite PR #190 (near-root firebase detection) lands and the mount re-syncs, firebase auto-detects and can be dropped from this acceptance, leaving only node. flutter, android, ios, and executable-requirements all fingerprint-match (app/, app/android, app/ios, dev/requirements/requirements.md) and are declared without acceptance."
+      "reason": "node genuinely applies but its package.json lives at firebase/functions/package.json — two directories down, past the node pack's intentional near-root fingerprint cap (root or one dir down) that keeps nested fixtures from tripping detection. So the declaration is deliberately ahead of the fingerprint here. Every other declared pack fingerprint-matches without acceptance: flutter (app/pubspec.yaml), firebase (firebase/firebase.json, one dir down — now detected since Claudinite PR #190), android (app/android/.../AndroidManifest.xml), ios (app/ios/Runner/Info.plist), executable-requirements (dev/requirements/requirements.md)."
     }
   ]
 }
