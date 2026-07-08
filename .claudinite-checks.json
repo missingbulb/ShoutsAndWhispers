@@ -1,10 +1,6 @@
 {
   "packs": [
-    "spec-driven-product",
-    "executable-requirements",
-    "flutter",
-    "firebase",
-    "node"
+    "spec-driven-product"
   ],
   "rules": {},
   "accept": []
