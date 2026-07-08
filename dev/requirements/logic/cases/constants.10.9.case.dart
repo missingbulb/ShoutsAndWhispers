@@ -4,7 +4,7 @@ import 'package:shouts_and_whispers/config.dart';
 import '../../shared/cases.dart';
 
 /// The client's product constants match the spec (and mirror
-/// `functions/src/constants.ts`): whisper radius 150 m, shout radius
+/// `firebase/functions/src/constants.ts`): whisper radius 150 m, shout radius
 /// 1,500 m, max message length 500.
 final theCase = LogicCase(
   id: '10.9',

@@ -2,7 +2,7 @@
 //
 // The vectors are standard-geohash values (Niemeyer / geohash.org): the
 // (57.64911, 10.40744) -> 'u4pruydqqvj' example is the canonical Wikipedia
-// vector. The backend has a mirror test (functions/test/geohash-compat.test.ts)
+// vector. The backend has a mirror test (firebase/functions/test/geohash-compat.test.ts)
 // checking the same coordinates against geofire-common, which must produce
 // identical hashes for EVERY coordinate — including bisection midpoints such
 // as (0, 0), where both encoders place the point in the lower half-cell

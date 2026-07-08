@@ -73,7 +73,7 @@ tests — the refreshed PNGs land in the diff for the owner to approve.
 Green here means the UI is faithful *given honest adapters*. The platform
 boundaries themselves (real GPS/permissions, real Google sign-in, real
 Firestore/Functions, push, store installability) are covered by the adapter
-layer, `functions/test/`, and the deliberate v1 gaps in
+layer, `firebase/functions/test/`, and the deliberate v1 gaps in
 [docs/DESIGN.md](../../docs/DESIGN.md) §7. A future `device` kind (real
 emulator boot smoke) is the intended home for "the app actually launches on
 Android" — a singleton kind, like GCEC's `heavy/`.

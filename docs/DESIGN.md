@@ -244,12 +244,13 @@ Deliberately rudimentary UI, as agreed: one sign-in screen, one home screen.
 
 ```
 app/                    Flutter client (ports/adapters — UI-ARCHITECTURE.md)
-functions/              Cloud Functions (TypeScript, Node 22)
+firebase/               Firebase project root (dir the Firebase CLI reads)
+  firebase.json         Firebase project config
+  .firebaserc           project aliases (committed default = dev — ENVIRONMENTS.md)
+  firestore.rules       security rules
+  firestore.indexes.json  (empty — single-field indexes suffice)
+  functions/            Cloud Functions (TypeScript, Node 22)
 dev/requirements/       executable UI requirements (spec + cases + goldens)
-firestore.rules         security rules
-firestore.indexes.json  (empty — single-field indexes suffice)
-firebase.json           Firebase project config
-.firebaserc             project aliases (committed default = dev — ENVIRONMENTS.md)
 docs/                   this document, UI-ARCHITECTURE.md, ENVIRONMENTS.md
 ```
 
@@ -267,9 +268,9 @@ Check so only store-installed apps reach it.
 
 | constant          | value  | lives in                                      |
 |-------------------|--------|-----------------------------------------------|
-| `WHISPER_RADIUS_M`| 150    | `functions/src/constants.ts`, `app/lib/config.dart` |
+| `WHISPER_RADIUS_M`| 150    | `firebase/functions/src/constants.ts`, `app/lib/config.dart` |
 | `SHOUT_RADIUS_M`  | 1500   | same                                          |
-| `PRESENCE_TTL`    | 5 min  | `functions/src/constants.ts`                  |
+| `PRESENCE_TTL`    | 5 min  | `firebase/functions/src/constants.ts`         |
 | `MAX_TEXT_LEN`    | 500    | both (client pre-validates, server enforces)  |
-| `SEND_COOLDOWN`   | 5 s    | `functions/src/constants.ts`                  |
+| `SEND_COOLDOWN`   | 5 s    | `firebase/functions/src/constants.ts`         |
 | heartbeat cadence | 25 m / 2 min / 30 s throttle | `app/lib/config.dart`  |

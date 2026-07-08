@@ -15,7 +15,7 @@ architecture that makes these tests possible is
 > platform boundaries themselves: real GPS permission dialogs, real Google
 > sign-in, real Firestore/Functions traffic, push delivery, or store
 > installability. Those live at the adapter/backend layers
-> (`functions/test/`, security-rules checks) and in the deliberate v1 gaps
+> (`firebase/functions/test/`, security-rules checks) and in the deliberate v1 gaps
 > listed in [docs/DESIGN.md](../../docs/DESIGN.md) §7. A green suite means:
 > *given* honest adapters, the UI shows and does what this document says.
 

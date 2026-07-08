@@ -16,12 +16,13 @@ environment plan is [docs/ENVIRONMENTS.md](docs/ENVIRONMENTS.md).
 
 ```
 app/                    Flutter client (ports/adapters — see docs/UI-ARCHITECTURE.md)
-functions/              Cloud Functions (TypeScript, Node 22)
+firebase/               Firebase project root (everything the Firebase CLI reads)
+  firebase.json         Firebase project config
+  .firebaserc           project aliases (committed default = dev, always)
+  firestore.rules       Firestore security rules
+  firestore.indexes.json  Firestore indexes (empty — single-field indexes suffice)
+  functions/            Cloud Functions (TypeScript, Node 22)
 dev/requirements/       executable UI requirements: spec, cases, goldens, runners
-firestore.rules         Firestore security rules
-firestore.indexes.json  Firestore indexes (empty — single-field indexes suffice)
-firebase.json           Firebase project config
-.firebaserc             project aliases (committed default = dev, always)
 docs/                   design, UI architecture, environments
 ```
 
@@ -43,7 +44,7 @@ store-installed apps will talk to prod) is
 
 1. **Create the dev Firebase project** at
    <https://console.firebase.google.com> (suggested id:
-   `shouts-whispers-dev` — update `.firebaserc` if you pick another) and
+   `shouts-whispers-dev` — update `firebase/.firebaserc` if you pick another) and
    upgrade it to the Blaze plan.
 
 2. **Enable Google sign-in**: in the console, Authentication → Sign-in
@@ -73,14 +74,18 @@ store-installed apps will talk to prod) is
    Firebase console, then re-download `google-services.json` (or re-run
    `flutterfire configure`).
 
-5. **Deploy the backend** (functions and Firestore rules), from the repo root:
+5. **Deploy the backend** (functions and Firestore rules), from the
+   `firebase/` project root:
 
    ```sh
+   cd firebase
    npm --prefix functions install
    firebase deploy --only functions,firestore
    ```
 
-   The deploy's predeploy hook compiles the TypeScript automatically.
+   The deploy's predeploy hook compiles the TypeScript automatically. (The
+   Firebase CLI locates the project by the `firebase.json` in `firebase/`;
+   from elsewhere in the repo, pass `--config firebase/firebase.json`.)
 
 ## Run the app
 
@@ -96,9 +101,10 @@ The map uses OpenStreetMap tiles, so no maps API key is needed.
 
 ## Development
 
-Cloud Functions (`functions/`):
+Cloud Functions (`firebase/functions/`):
 
 ```sh
+cd firebase/functions
 npm run build   # tsc
 npm test        # vitest — pure-function tests, no emulator needed
 ```
