@@ -8,6 +8,9 @@
     "firebase",
     "node"
   ],
+  "packConfig": {
+    "node": { "dirs": ["firebase/functions"] }
+  },
   "rules": {},
   "accept": [
     {
