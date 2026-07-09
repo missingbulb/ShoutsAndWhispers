@@ -1,3 +1,7 @@
 .dart_tool/
 build/
 .flutter-plugins-dependencies
+__pycache__/
+# Saga animation mismatch artifacts (expected | actual | diff), written on a
+# failing saga_requirements_test run — see shared/saga_animation.dart.
+failures/

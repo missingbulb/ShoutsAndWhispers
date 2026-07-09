@@ -6,10 +6,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shouts_and_whispers/testing/world.dart';
 
 import 'cases.dart';
+import 'saga_animation.dart';
 
-/// Phone-shaped test viewport: 393×852 logical (Pixel-class portrait).
-/// Goldens are captured at logical resolution — one committed PNG per frame.
-const Size viewportSize = Size(393, 852);
+/// Phone-shaped test viewport: 375×812 logical — iPhone 13 mini, about the
+/// smallest widely-used modern phone, so the UI is proven at a tight size.
+/// Screen stills are captured at [viewportDpr]; saga animations override the
+/// capture ratio with the smaller [sagaAnimationDpr] (shared/saga_animation.dart).
+const Size viewportSize = Size(375, 812);
 const double viewportDpr = 3.0;
 
 bool _fontsLoaded = false;
@@ -98,15 +101,17 @@ Future<void> runScreenCase(WidgetTester tester, ScreenCase c) async {
   await expectGolden(tester, 'screen', '${c.slug}.${c.id}');
 }
 
-/// Runs a [SagaCase]: one golden frame per step, numbered from 01.
+/// Runs a [SagaCase]: records the real UI's motion through every step into one
+/// animated PNG (APNG) and compares it, by exact identity, to the committed
+/// `saga/cases/<slug>.<id>.png`. See shared/saga_animation.dart.
 Future<void> runSagaCase(WidgetTester tester, SagaCase c) async {
   final world = FakeWorld();
   c.arrange(world);
   await pumpWorld(tester, world);
-  for (var i = 0; i < c.steps.length; i++) {
-    await c.steps[i].act(tester, world);
-    await settle(tester);
-    final frame = (i + 1).toString().padLeft(2, '0');
-    await expectGolden(tester, 'saga', '${c.slug}.${c.id}.step-$frame');
+  final recorder = SagaRecorder(region: c.region);
+  await recorder.open(tester);
+  for (final step in c.steps) {
+    await recorder.step(tester, () => step.act(tester, world));
   }
+  await recorder.compareOrUpdate(tester, '${c.slug}.${c.id}');
 }

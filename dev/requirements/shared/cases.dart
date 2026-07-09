@@ -7,15 +7,16 @@ import 'package:shouts_and_whispers/testing/world.dart';
 /// with a `cases/` subfolder exists without a registry entry, or vice versa.
 ///
 /// [KindImages.one] — the case's expected is exactly one committed golden
-/// PNG beside it. [KindImages.frames] — an ordered storyboard of
-/// `*.step-NN.png` goldens. [KindImages.none] — coded assertions only; a
-/// PNG in the folder is a defect (a screenshot cannot verify a gesture or a
-/// pure rule).
-enum KindImages { one, frames, none }
+/// PNG beside it. [KindImages.animation] — exactly one committed
+/// `<slug>.<id>.png`, but an *animated* PNG (APNG) recording the whole story
+/// (see [SagaCase] and shared/saga_animation.dart). [KindImages.none] —
+/// coded assertions only; a PNG in the folder is a defect (a screenshot
+/// cannot verify a gesture or a pure rule).
+enum KindImages { one, animation, none }
 
 const Map<String, KindImages> kinds = <String, KindImages>{
   'screen': KindImages.one,
-  'saga': KindImages.frames,
+  'saga': KindImages.animation,
   'behavior': KindImages.none,
   'logic': KindImages.none,
 };
@@ -73,8 +74,11 @@ class ScreenCase extends RequirementCase {
   final Duration settle;
 }
 
-/// One step of a saga: a caption for the storyboard and the action that
-/// advances the story. A golden frame is captured after each step.
+/// One step of a saga: a short caption naming what the step does, and the
+/// action that advances the story. The recorder captures the UI's motion
+/// after each step's [act] (see shared/saga_animation.dart). The caption
+/// documents the step in the case file; it is the natural source if
+/// per-segment subtitles are ever burned into the animation.
 class SagaStep {
   const SagaStep(this.caption, this.act);
 
@@ -82,8 +86,11 @@ class SagaStep {
   final Future<void> Function(WidgetTester tester, FakeWorld world) act;
 }
 
-/// A user story rendered as an ordered storyboard of golden frames
-/// `<slug>.<id>.step-NN.png`, one per step, driven against the fake world.
+/// A user story recorded as a single animated PNG (APNG) golden
+/// `<slug>.<id>.png`: the real app shell driven step by step against the fake
+/// world, with the UI's motion between states captured — not just the resting
+/// frames. See shared/saga_animation.dart for capture, delay-shortening,
+/// encoding, and the identity comparison.
 class SagaCase extends RequirementCase {
   const SagaCase({
     required super.id,
@@ -91,12 +98,20 @@ class SagaCase extends RequirementCase {
     required super.description,
     required this.arrange,
     required this.steps,
+    this.region,
   });
 
   /// Initial world state before the first frame's step runs.
   final void Function(FakeWorld world) arrange;
 
   final List<SagaStep> steps;
+
+  /// Optional sub-region to record instead of the whole app — a [Finder]
+  /// matching exactly one widget (e.g. `find.byType(AppBar)` for just the top
+  /// bar). The full frame is captured and cropped to the finder's rect, so no
+  /// extra `RepaintBoundary` is needed. Null (the default) records the whole
+  /// app.
+  final Finder? region;
 }
 
 /// A driven gesture asserted by code — what a static image cannot observe.

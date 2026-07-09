@@ -44,15 +44,11 @@ String buildGallery(
     }
     final saga = sagaById[id];
     if (saga != null) {
+      final name = '${saga.slug}.${saga.id}';
       out.add('');
-      for (var i = 0; i < saga.steps.length; i++) {
-        final frame = (i + 1).toString().padLeft(2, '0');
-        final name = '${saga.slug}.${saga.id}.step-$frame';
-        out.add(
-          '  ![Step ${i + 1} — ${saga.steps[i].caption}]'
-          '(saga/cases/$name.png) $galleryMarker$id:${i + 1} -->',
-        );
-      }
+      out.add(
+        '  ![${saga.description}](saga/cases/$name.png) $galleryMarker$id -->',
+      );
     }
   }
 

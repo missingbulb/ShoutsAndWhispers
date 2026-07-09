@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerates every golden (screens + saga storyboards) and the gallery.
+"""Regenerates every golden (screen stills + saga animations) and the gallery.
 
 Usage, from dev/requirements/:  python3 refresh_goldens.py
 

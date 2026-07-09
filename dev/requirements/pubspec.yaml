@@ -15,6 +15,9 @@ dependencies:
   # Direct import in behavior cases (map camera assertions); version is
   # pinned by the app package's resolution.
   flutter_map: ^8.3.1
+  # Assembles saga recordings into animated PNG (APNG) goldens and decodes
+  # them for the per-frame failure diff (shared/saga_animation.dart).
+  image: ^4.5.0
   shouts_and_whispers:
     path: ../../app
 
