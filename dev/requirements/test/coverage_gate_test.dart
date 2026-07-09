@@ -113,21 +113,15 @@ void main() {
           problems.addAll(
               pngs.map((n) => '${entry.key}/cases/$n: image in a coded kind'));
         case KindImages.one:
+        case KindImages.animation:
+          // Both expect exactly one `<slug>.<id>.png` per case — a still for
+          // `one`, an animated PNG (APNG) for `animation`. Same on-disk shape.
           final expected = manifests[entry.key]!
               .map((c) => '${c.slug}.${c.id}.png')
               .toSet();
           problems.addAll(pngs
               .difference(expected)
               .map((n) => '${entry.key}/cases/$n: stray golden (no case)'));
-        case KindImages.frames:
-          final expected = <String>{
-            for (final c in manifests[entry.key]!.cast<SagaCase>())
-              for (var i = 1; i <= c.steps.length; i++)
-                '${c.slug}.${c.id}.step-${i.toString().padLeft(2, '0')}.png',
-          };
-          problems.addAll(pngs
-              .difference(expected)
-              .map((n) => '${entry.key}/cases/$n: stray frame (no step)'));
       }
     }
     expect(problems, isEmpty, reason: problems.join('\n'));

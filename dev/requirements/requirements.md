@@ -21,7 +21,8 @@ architecture that makes these tests possible is
 
 **Kinds:** `screen` — a rendered resting state, pixel-compared against a
 committed golden PNG (shown inline below each leaf). `saga` — a multi-step
-user story rendered as an ordered storyboard of golden frames. `behavior` —
+user story recorded as a single animated PNG (APNG) golden that captures the
+real UI in motion between steps. `behavior` —
 a driven gesture asserted by code (what a static image cannot observe).
 `logic` — a pure product rule verified against shipped code. Images are
 regenerated, never hand-edited; committed goldens are owner-approved
@@ -240,58 +241,44 @@ The pure rules the widgets above lean on.
 
 ## 11. User sagas
 
-Complete use cases as storyboards — each frame is a golden of the real UI at
-that step of the story.
+Complete use cases recorded as animated PNGs — one golden per story,
+capturing the real UI in motion between steps (pure delays shortened).
 
 - `11.1` **First launch.** A new user signs in with Google, lands on the
   home screen while the app waits for a GPS fix (send disabled), the fix
   arrives (map recenters, blue dot appears, send still needs text), and the
   feed greets them empty.
 
-  ![Step 1 — a new user opens the app to the sign-in screen](saga/cases/first_launch.11.1.step-01.png) <!-- req-gallery:11.1:1 -->
-  ![Step 2 — signed in: home, waiting for a GPS fix — send is locked](saga/cases/first_launch.11.1.step-02.png) <!-- req-gallery:11.1:2 -->
-  ![Step 3 — the fix arrives — blue dot on the map, feed honestly empty](saga/cases/first_launch.11.1.step-03.png) <!-- req-gallery:11.1:3 -->
-  ![Step 4 — words typed — send unlocks, the whole loop is ready](saga/cases/first_launch.11.1.step-04.png) <!-- req-gallery:11.1:4 -->
+  ![first launch: sign in with Google, wait for a fix, get located, meet the empty feed](saga/cases/first_launch.11.1.png) <!-- req-gallery:11.1 -->
 - `11.2` **A shout arrives.** While you stand on Rothschild Blvd, Ada —
   400 m away — shouts; the message lands in your feed with the SHOUT badge
   and its megaphone marker appears on the map where she stood.
 
-  ![Step 1 — standing on Rothschild Blvd, feed empty](saga/cases/shout_arrives.11.2.step-01.png) <!-- req-gallery:11.2:1 -->
-  ![Step 2 — Ada shouts from up the boulevard — it lands instantly with the SHOUT badge](saga/cases/shout_arrives.11.2.step-02.png) <!-- req-gallery:11.2:2 -->
-  ![Step 3 — the deep-orange megaphone marker pins the map 400 m up the boulevard — exactly where she stood](saga/cases/shout_arrives.11.2.step-03.png) <!-- req-gallery:11.2:3 -->
+  ![a shout from Ada 400 m away lands in the feed with the SHOUT badge and its megaphone marker on the map](saga/cases/shout_arrives.11.2.png) <!-- req-gallery:11.2 -->
 - `11.3` **Whispering back.** You type a reply, flip the toggle stays
   whisper, send it — the button spins while in flight — and the snackbar
   confirms **"Delivered to 1 people nearby"** while your own entry tops the
   feed marked **"you"**.
 
-  ![Step 1 — a reply, kept to a whisper](saga/cases/whisper_back.11.3.step-01.png) <!-- req-gallery:11.3:1 -->
-  ![Step 2 — in flight — the button spins](saga/cases/whisper_back.11.3.step-02.png) <!-- req-gallery:11.3:2 -->
-  ![Step 3 — delivered to 1 person nearby — your whisper tops the feed as "you"](saga/cases/whisper_back.11.3.step-03.png) <!-- req-gallery:11.3:3 -->
+  ![a whisper reply: the button spins in flight, then the delivery snackbar and your own entry marked "you"](saga/cases/whisper_back.11.3.png) <!-- req-gallery:11.3 -->
 - `11.4` **The audience is decided at send time.** Grace shouted two blocks
   away *before* you arrived there — your feed never shows it. You walk to
   that exact spot; the feed still doesn't. Only when Grace shouts *again*,
   now that you are nearby, does her message land. Late arrival never
   back-fills.
 
-  ![Step 1 — you are at the corner; two blocks away Grace shouted five minutes ago — your feed is empty and stays that way](saga/cases/send_time_audience.11.4.step-01.png) <!-- req-gallery:11.4:1 -->
-  ![Step 2 — you walk to that exact spot — the old shout never back-fills](saga/cases/send_time_audience.11.4.step-02.png) <!-- req-gallery:11.4:2 -->
-  ![Step 3 — Grace shouts again, now that you are here — THIS one lands](saga/cases/send_time_audience.11.4.step-03.png) <!-- req-gallery:11.4:3 -->
+  ![the audience is decided at send time — walking to the spot later never back-fills an old shout; only a fresh one lands](saga/cases/send_time_audience.11.4.png) <!-- req-gallery:11.4 -->
 - `11.5` **Permission trouble.** Mid-session the location permission is
   revoked — the banner explains, the send button locks (stale fix cleared).
   Retry after re-granting restores the fix and the button.
 
-  ![Step 1 — located and listening](saga/cases/permission_trouble.11.5.step-01.png) <!-- req-gallery:11.5:1 -->
-  ![Step 2 — permission revoked — the app says so and locks send](saga/cases/permission_trouble.11.5.step-02.png) <!-- req-gallery:11.5:2 -->
-  ![Step 3 — permission restored: banner gone, blue dot back](saga/cases/permission_trouble.11.5.step-03.png) <!-- req-gallery:11.5:3 -->
+  ![permission revoked mid-session shows the banner and locks send; Retry after re-granting restores the fix](saga/cases/permission_trouble.11.5.png) <!-- req-gallery:11.5 -->
 - `11.6` **Pruning your feed.** A long-press on Ada's old message opens the
   confirmation; Delete removes it from the feed — the map marker goes with
   it.
 
-  ![Step 1 — two messages, two markers](saga/cases/prune_feed.11.6.step-01.png) <!-- req-gallery:11.6:1 -->
-  ![Step 2 — delete? your copy only](saga/cases/prune_feed.11.6.step-02.png) <!-- req-gallery:11.6:2 -->
-  ![Step 3 — gone from the feed — and its marker left the map](saga/cases/prune_feed.11.6.step-03.png) <!-- req-gallery:11.6:3 -->
+  ![long-press plus Delete removes the entry from the feed and its marker from the map](saga/cases/prune_feed.11.6.png) <!-- req-gallery:11.6 -->
 - `11.7` **Signing out.** From a lived-in home screen, sign-out lands back
   on the sign-in screen.
 
-  ![Step 1 — a lived-in session](saga/cases/sign_out.11.7.step-01.png) <!-- req-gallery:11.7:1 -->
-  ![Step 2 — back at the door — sign-in screen](saga/cases/sign_out.11.7.step-02.png) <!-- req-gallery:11.7:2 -->
+  ![sign-out from a lived-in home screen lands back on the sign-in screen](saga/cases/sign_out.11.7.png) <!-- req-gallery:11.7 -->

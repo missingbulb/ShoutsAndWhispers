@@ -33,7 +33,7 @@ storyboard **saga** kind.
 | kind | proves | expected | runner |
 |---|---|---|---|
 | `screen` | a rendered resting state | one golden PNG beside the case, pixel-exact | `test/screen_requirements_test.dart` |
-| `saga` | a multi-step user story | an ordered storyboard `*.step-NN.png`, pixel-exact | `test/saga_requirements_test.dart` |
+| `saga` | a multi-step user story | one animated PNG (APNG) `<slug>.<id>.png` recording the UI in motion, compared by exact identity | `test/saga_requirements_test.dart` |
 | `behavior` | a driven gesture / outgoing request | coded assertions on the fakes' recordings | `test/behavior_requirements_test.dart` |
 | `logic` | a pure product rule | coded `verify()` against shipped code | `test/logic_requirements_test.dart` |
 
@@ -44,6 +44,36 @@ in `<kind>/manifest.dart` (Dart has no dynamic import; the gate verifies the
 manifest matches the files on disk exactly). Goldens live beside their case
 and are embedded into `requirements.md` by the machine-managed gallery
 (`tool/build_gallery.dart`; `test/gallery_gate_test.dart` keeps it current).
+
+## Saga animations
+
+A `saga`'s expected is one committed **animated PNG (APNG)**,
+`saga/cases/<slug>.<id>.png`, recording the real UI *in motion* through the
+story — spinners, dialog fades, snackbar slides, feed inserts, map recenters
+— not a slideshow of resting states. `shared/saga_animation.dart` owns the
+pipeline:
+
+- **Capture** — the outermost `RepaintBoundary` (the same one the stills use)
+  to raw RGBA once per pumped frame, at DPR 1.0 (APNG is lossless, so a low
+  DPR costs no fidelity and keeps generation cheap enough for every run).
+- **Shorten delays** — time is virtual, so a scripted wait is a run of
+  *identical* frames. Consecutive identical frames collapse and any single
+  hold is clamped; genuine animation survives. The APNG contains the
+  animation, not the waiting.
+- **Compare by identity** — the assertion is exact byte-equality of the
+  encoded APNG. Deterministic given identical pixels (no palette/dither,
+  fixed compression). On a mismatch it writes an `expected | actual | diff`
+  per-frame artifact under `failures/` (git-ignored) and names the differing
+  frames.
+- **Region capture** — a `SagaCase` may set `region:` to a `Finder` (e.g.
+  `find.byType(AppBar)`) to record just that part of the screen; the frame is
+  cropped to the finder's rect.
+
+Because identity comparison is zero-tolerance to sub-pixel rendering drift
+(font hinting / AA across host OS and Flutter version), **saga goldens are
+generated and verified on one canonical platform — CI.** This is the same
+single-platform constraint the pixel-compared stills already carry, made
+strict.
 
 ## The fake world
 
