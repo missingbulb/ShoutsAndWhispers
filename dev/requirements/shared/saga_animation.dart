@@ -29,6 +29,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -62,6 +63,21 @@ const Duration _maxHold = Duration(milliseconds: 500);
 /// take in the resting state before the story moves on.
 const Duration _restHold = Duration(milliseconds: 700);
 
+// --- gesture shockwave --------------------------------------------------
+// When a step performs a real pointer gesture (tap, long-press, drag), an
+// expanding ring is painted at the gesture point over the pre-reaction frame,
+// so the storyboard makes clear *where the user acted* before the UI responds.
+
+/// Number of synthetic ring frames per gesture.
+const int _shockFrames = 6;
+
+/// Display time of each ring frame.
+const Duration _shockGap = Duration(milliseconds: 45);
+
+/// Ring radius (logical px) at the first frame, and its growth per frame.
+const double _shockRadius0 = 10;
+const double _shockGrow = 13;
+
 /// One retained animation frame: tightly-copied RGBA pixels plus how long to
 /// display it.
 class _Frame {
@@ -89,18 +105,34 @@ class SagaRecorder {
   final List<_Frame> _frames = <_Frame>[];
   Rect? _regionLogical;
 
-  /// Captures the opening resting state as the first frame.
+  /// Pointer-down positions (logical) seen during the current step's [act].
+  final List<Offset> _stepDowns = <Offset>[];
+
+  void _onPointer(PointerEvent event) {
+    if (event is PointerDownEvent) _stepDowns.add(event.position);
+  }
+
+  /// Captures the opening resting state as the first frame, and starts
+  /// listening for the gestures that steps perform.
   Future<void> open(WidgetTester tester) async {
+    GestureBinding.instance.pointerRouter.addGlobalRoute(_onPointer);
+    addTearDown(
+        () => GestureBinding.instance.pointerRouter.removeGlobalRoute(_onPointer));
     await _capture(tester, _restHold, _restHold);
   }
 
   /// Runs [act], then records the resulting animation frame-by-frame until it
-  /// settles (or the per-step cap), and holds the settled frame for reading.
+  /// settles (or the per-step cap), holds the settled frame for reading, and —
+  /// if the step performed a pointer gesture — paints an expanding ring at the
+  /// gesture point over the pre-reaction frame.
   Future<void> step(
     WidgetTester tester,
     Future<void> Function() act,
   ) async {
+    _stepDowns.clear();
     await act();
+    final gestures = List<Offset>.of(_stepDowns);
+    final startIdx = _frames.length;
     var stable = 0;
     for (var i = 0; i < _maxFramesPerStep; i++) {
       await tester.pump(_frameGap);
@@ -112,6 +144,7 @@ class SagaRecorder {
       }
     }
     _rest();
+    if (gestures.isNotEmpty) _insertShockwave(startIdx, gestures);
   }
 
   /// Encodes the retained frames into one animated PNG (APNG). Deterministic
@@ -226,6 +259,69 @@ class SagaRecorder {
     if (_frames.isEmpty) return;
     final f = _frames.last;
     if (f.hold < _restHold) f.hold = _restHold;
+  }
+
+  /// Inserts, before a step's captured frames, a short expanding-ring
+  /// animation centred on each gesture — painted over the pre-reaction frame
+  /// (the settled state at the moment of the gesture), so the reader sees
+  /// *where the user acted* before the UI responds. Guarantees the shockwave
+  /// animates even when the step's own frames deduplicated to one.
+  void _insertShockwave(int startIdx, List<Offset> gestures) {
+    final baseIdx = startIdx > 0 ? startIdx - 1 : 0;
+    if (baseIdx >= _frames.length) return;
+    final base = _frames[baseIdx];
+
+    final synth = <_Frame>[];
+    for (var k = 0; k < _shockFrames; k++) {
+      final canvas = img.Image.fromBytes(
+        width: base.width,
+        height: base.height,
+        bytes: Uint8List.fromList(base.bytes).buffer, // copy — never mutate base
+        numChannels: 4,
+        order: img.ChannelOrder.rgba,
+      );
+      for (final g in gestures) {
+        _drawShockwave(canvas, g, k);
+      }
+      synth.add(_Frame(
+        canvas.getBytes(order: img.ChannelOrder.rgba),
+        base.width,
+        base.height,
+        _shockGap,
+      ));
+    }
+    _frames.insertAll(startIdx, synth);
+  }
+
+  /// Paints one frame of the ring for gesture [g] at animation step [k].
+  void _drawShockwave(img.Image canvas, Offset g, int k) {
+    // Gesture is in logical view coords; map into (possibly cropped) image px.
+    final ox = _regionLogical == null ? 0.0 : _regionLogical!.left * dpr;
+    final oy = _regionLogical == null ? 0.0 : _regionLogical!.top * dpr;
+    final cx = (g.dx * dpr - ox).round();
+    final cy = (g.dy * dpr - oy).round();
+    final radius = ((_shockRadius0 + k * _shockGrow) * dpr).round();
+    final fade = 1.0 - k / _shockFrames;
+
+    // Translucent halo, a crisp white ring, and a dark inner edge so the mark
+    // reads on both light and dark UI.
+    img.fillCircle(canvas,
+        x: cx,
+        y: cy,
+        radius: radius,
+        color: img.ColorRgba8(255, 255, 255, (70 * fade).round()));
+    img.drawCircle(canvas,
+        x: cx,
+        y: cy,
+        radius: radius,
+        color: img.ColorRgba8(255, 255, 255, (220 * fade).round()));
+    if (radius > 2) {
+      img.drawCircle(canvas,
+          x: cx,
+          y: cy,
+          radius: radius - 2,
+          color: img.ColorRgba8(0, 0, 0, (110 * fade).round()));
+    }
   }
 
   // --- diff artifact (failure path only) ----------------------------------

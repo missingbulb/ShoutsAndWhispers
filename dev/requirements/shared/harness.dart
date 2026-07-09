@@ -8,10 +8,11 @@ import 'package:shouts_and_whispers/testing/world.dart';
 import 'cases.dart';
 import 'saga_animation.dart';
 
-/// Phone-shaped test viewport: 393×852 logical (Pixel-class portrait).
+/// Phone-shaped test viewport: 375×812 logical — iPhone 13 mini, about the
+/// smallest widely-used modern phone, so the UI is proven at a tight size.
 /// Screen stills are captured at [viewportDpr]; saga animations override the
 /// capture ratio with the smaller [sagaAnimationDpr] (shared/saga_animation.dart).
-const Size viewportSize = Size(393, 852);
+const Size viewportSize = Size(375, 812);
 const double viewportDpr = 3.0;
 
 bool _fontsLoaded = false;
