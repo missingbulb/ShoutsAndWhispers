@@ -1,8 +1,6 @@
 /.claudinite/*
-!/.claudinite/mount/
-/.claudinite/mount/*
-!/.claudinite/mount/sync-claudinite.sh
-/.claudinite.new/
+!/.claudinite/shared/
+!/.claudinite/local_packs/
 /.claudinite-hooks.log
 /.claudinite-hooks.log.tmp
 

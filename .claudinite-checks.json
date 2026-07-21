@@ -6,11 +6,24 @@
     "android",
     "ios",
     "firebase",
-    "node"
+    {
+      "id": "node",
+      "config": {
+        "dirs": [
+          "firebase/functions"
+        ]
+      }
+    },
+    "basics",
+    {
+      "id": "barriers",
+      "via": [
+        "basics"
+      ]
+    },
+    "tidy-repo",
+    "grow_with_claudinite"
   ],
-  "packConfig": {
-    "node": { "dirs": ["firebase/functions"] }
-  },
   "rules": {},
   "accept": [
     {
@@ -18,5 +31,12 @@
       "path": ".claudinite-checks.json",
       "reason": "node genuinely applies but its package.json lives at firebase/functions/package.json — two directories down, past the node pack's intentional near-root fingerprint cap (root or one dir down) that keeps nested fixtures from tripping detection. So the declaration is deliberately ahead of the fingerprint here. Every other declared pack fingerprint-matches without acceptance: flutter (app/pubspec.yaml), firebase (firebase/firebase.json, one dir down — now detected since Claudinite PR #190), android (app/android/.../AndroidManifest.xml), ios (app/ios/Runner/Info.plist), executable-requirements (dev/requirements/requirements.md)."
     }
-  ]
+  ],
+  "maintenance": {
+    "delivery": "auto"
+  },
+  "claudinite": {
+    "updated": "2026-07-21T09:56:54.286Z",
+    "ref": "9a680934281f97cb61f280cca6d8f6a155750c8f"
+  }
 }
