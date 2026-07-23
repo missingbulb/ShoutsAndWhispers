@@ -28,14 +28,14 @@
     {
       "rule": "pack-declaration",
       "path": ".claudinite-checks.json",
-      "reason": "node genuinely applies but its package.json lives at firebase/functions/package.json \u2014 two directories down, past the node pack's intentional near-root fingerprint cap (root or one dir down) that keeps nested fixtures from tripping detection. So the declaration is deliberately ahead of the fingerprint here. Every other declared pack fingerprint-matches without acceptance: flutter (app/pubspec.yaml), firebase (firebase/firebase.json, one dir down \u2014 now detected since Claudinite PR #190), android (app/android/.../AndroidManifest.xml), ios (app/ios/Runner/Info.plist), executable-requirements (dev/requirements/requirements.md)."
+      "reason": "node genuinely applies but its package.json lives at firebase/functions/package.json — two directories down, past the node pack's intentional near-root fingerprint cap (root or one dir down) that keeps nested fixtures from tripping detection. So the declaration is deliberately ahead of the fingerprint here. Every other declared pack fingerprint-matches without acceptance: flutter (app/pubspec.yaml), firebase (firebase/firebase.json, one dir down — now detected since Claudinite PR #190), android (app/android/.../AndroidManifest.xml), ios (app/ios/Runner/Info.plist), executable-requirements (dev/requirements/requirements.md)."
     }
   ],
   "maintenance": {
     "delivery": "auto-merge"
   },
   "claudinite": {
-    "updated": "2026-07-21T22:51:47.275Z",
-    "ref": "d6bca9351cd0396cf068ea1199c6475993623a5d"
+    "updated": "2026-07-23T00:33:37.000Z",
+    "ref": "80783ebbc1b9d37f85d544864c9c55343c5dddea"
   }
 }
