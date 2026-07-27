@@ -10,11 +10,12 @@
 // token in .claudinite-checks.json.
 import crossTierConstants from './cross-tier-constants.mjs';
 import geohashPrecisionParity from './geohash-precision-parity.mjs';
+import senderRecipientCountParity from './sender-recipient-count-parity.mjs';
 
 export default {
   id: 'shouts-and-whispers',
   detect: null,
   marker: null,
   prose: 'RULES.md',
-  rules: [crossTierConstants, geohashPrecisionParity],
+  rules: [crossTierConstants, geohashPrecisionParity, senderRecipientCountParity],
 };

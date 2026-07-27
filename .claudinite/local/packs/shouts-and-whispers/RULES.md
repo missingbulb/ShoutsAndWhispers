@@ -21,8 +21,10 @@ file is how to keep from breaking it by accident.
 - **The sender is a recipient unconditionally.** `selectRecipients` seeds the list with the
   sender (`distanceM: 0`, `isOwn: true`) before it looks at a single candidate — the
   sender's own copy does not depend on their presence doc existing or being fresh
-  (DESIGN.md §1.5). `recipientCount` is therefore `recipients.length - 1`, and the two
-  facts move together: change one and the count reported to the sender starts lying.
+  (DESIGN.md §1.5). The arithmetic that follows — the reported `recipientCount` is the
+  list length minus that seed — is mechanical and is checked
+  (`sender-recipient-count-parity`); what is stated here is *why* the seed is
+  unconditional, which no check can hold.
 - **A stale heartbeat means absent, with no fallback.** `PRESENCE_TTL_MS` is the entire
   definition of "known to be near" (DESIGN.md §1.2). A user whose last position is older
   than the cutoff is not a recipient — never "their last known position, probably still

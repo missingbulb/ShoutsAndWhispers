@@ -17,6 +17,7 @@ import { execFileSync } from 'node:child_process';
 
 import crossTierConstants from './cross-tier-constants.mjs';
 import geohashPrecisionParity from './geohash-precision-parity.mjs';
+import senderRecipientCountParity from './sender-recipient-count-parity.mjs';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 
@@ -128,4 +129,84 @@ test('geohash-precision-parity: fires when a call site drops the explicit precis
 
 test('geohash-precision-parity: quiet on the real repo', () => {
   assert.deepEqual(geohashPrecisionParity.run(realCtx()), []);
+});
+
+// The sender seed lives in recipients.ts, the subtraction in index.ts; the
+// fixtures move each half independently, in both directions.
+const SEEDED = '[{ uid: senderUid, distanceM: 0, isOwn: true }]';
+
+const recipientFiles = (seed, countExpr) => ({
+  'firebase/functions/src/recipients.ts': `
+export function selectRecipients(candidates, center, radiusM, nowMs, senderUid): Recipient[] {
+  const recipients: Recipient[] = ${seed};
+  return recipients;
+}
+`,
+  'firebase/functions/src/index.ts': `
+  const recipients = selectRecipients(candidates, [lat, lng], radiusM, nowMs, uid);
+  const recipientCount = ${countExpr}; // excludes the sender
+`,
+});
+
+test('sender-recipient-count-parity: fires when the count stops excluding the seeded sender', () => {
+  const findings = senderRecipientCountParity.run(
+    ctxOf(recipientFiles(SEEDED, 'recipients.length')),
+  );
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /subtracts 0 .* seeds it with 1 non-audience entry/);
+  assert.equal(findings[0].file, 'firebase/functions/src/index.ts');
+  assert.equal(findings[0].severity, 'blocking');
+});
+
+test('sender-recipient-count-parity: fires when the sender is no longer seeded but the count still subtracts', () => {
+  const findings = senderRecipientCountParity.run(
+    ctxOf(recipientFiles('[]', 'recipients.length - 1')),
+  );
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /subtracts 1 .* seeds it with 0 non-audience entries/);
+});
+
+test('sender-recipient-count-parity: fires when the seeded entry is not the sender\'s own copy', () => {
+  const findings = senderRecipientCountParity.run(
+    ctxOf(recipientFiles('[{ uid: senderUid, distanceM: 0 }]', 'recipients.length - 1')),
+  );
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /none of them is the sender's own copy/);
+  assert.equal(findings[0].file, 'firebase/functions/src/recipients.ts');
+});
+
+test('sender-recipient-count-parity: fires when the count is derived from something else', () => {
+  const findings = senderRecipientCountParity.run(
+    ctxOf(recipientFiles(SEEDED, 'candidates.length - 1')),
+  );
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /not the length of the selectRecipients result/);
+});
+
+test('sender-recipient-count-parity: fires when the seed declaration moves out of the scanned tree', () => {
+  const files = recipientFiles(SEEDED, 'recipients.length - 1');
+  delete files['firebase/functions/src/recipients.ts'];
+  const findings = senderRecipientCountParity.run(ctxOf(files));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /no seeded `Recipient\[\]` initializer found/);
+});
+
+test('sender-recipient-count-parity: fires when the reported count moves out of the scanned tree', () => {
+  const files = recipientFiles(SEEDED, 'recipients.length - 1');
+  files['firebase/functions/src/index.ts'] =
+    '  const recipients = selectRecipients(candidates, [lat, lng], radiusM, nowMs, uid);';
+  const findings = senderRecipientCountParity.run(ctxOf(files));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /no `const recipientCount = /);
+});
+
+test('sender-recipient-count-parity: quiet when the seed and the subtraction agree', () => {
+  assert.deepEqual(
+    senderRecipientCountParity.run(ctxOf(recipientFiles(SEEDED, 'recipients.length - 1'))),
+    [],
+  );
+});
+
+test('sender-recipient-count-parity: quiet on the real repo', () => {
+  assert.deepEqual(senderRecipientCountParity.run(realCtx()), []);
 });
