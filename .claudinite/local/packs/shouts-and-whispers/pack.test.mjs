@@ -17,6 +17,7 @@ import { execFileSync } from 'node:child_process';
 
 import crossTierConstants from './cross-tier-constants.mjs';
 import geohashPrecisionParity from './geohash-precision-parity.mjs';
+import geohashVectorParity from './geohash-vector-parity.mjs';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 
@@ -128,4 +129,89 @@ test('geohash-precision-parity: fires when a call site drops the explicit precis
 
 test('geohash-precision-parity: quiet on the real repo', () => {
   assert.deepEqual(geohashPrecisionParity.run(realCtx()), []);
+});
+
+// The paired known-vector suites. Each fixture carries the deliberately
+// UNPAIRED assertions too — the client's explicit-precision cases and the
+// server's default-precision (10-char) ones — so the fixtures prove the guard
+// reads only the shared precision-9 vectors and not every geohash literal in
+// sight.
+const GEOHASH_DART = (extra = '') => `
+test('canonical Wikipedia vector', () {
+  expect(encode(57.64911, 10.40744), 'u4pruydqq');
+  expect(encode(57.64911, 10.40744, precision: 11), 'u4pruydqqvj');
+});
+test('bisection midpoints', () {
+  expect(encode(0, 0), '7zzzzzzzz');
+});${extra}
+`;
+
+const GEOHASH_TS = (extra = '') => `
+it('encodes the Wikipedia reference point', () => {
+  expect(geohashForLocation([57.64911, 10.40744])).toBe('u4pruydqqv');
+});
+it('matches the client encoder at the shared precision 9', () => {
+  expect(geohashForLocation([57.64911, 10.40744], 9)).toBe('u4pruydqq');
+  expect(geohashForLocation([0, 0], 9)).toBe('7zzzzzzzz');
+});${extra}
+`;
+
+const vectorFiles = (dart, ts) => ({
+  'app/test/geohash_test.dart': dart,
+  'firebase/functions/test/geohash-compat.test.ts': ts,
+});
+
+test('geohash-vector-parity: fires when a vector is added to the client suite only', () => {
+  const findings = geohashVectorParity.run(ctxOf(vectorFiles(
+    GEOHASH_DART("\ntest('Sydney', () { expect(encode(-33.8688, 151.2093), 'r3gx2f77b'); });"),
+    GEOHASH_TS(),
+  )));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'firebase/functions/test/geohash-compat.test.ts');
+  assert.match(findings[0].what, /asserts \(-33\.8688, 151\.2093\) → 'r3gx2f77b'.*carries no precision-9 vector/);
+  assert.equal(findings[0].severity, 'blocking');
+});
+
+test('geohash-vector-parity: fires when a vector is added to the server suite only', () => {
+  const findings = geohashVectorParity.run(ctxOf(vectorFiles(
+    GEOHASH_DART(),
+    GEOHASH_TS("\nit('London', () => { expect(geohashForLocation([51.5074, -0.1278], 9)).toBe('gcpvj0duq'); });"),
+  )));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'app/test/geohash_test.dart');
+  assert.match(findings[0].what, /carries no precision-9 vector/);
+});
+
+test('geohash-vector-parity: fires once when the suites expect different hashes', () => {
+  const findings = geohashVectorParity.run(ctxOf(vectorFiles(
+    GEOHASH_DART(),
+    GEOHASH_TS().replace("'7zzzzzzzz'", "'s00000000'"),
+  )));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /disagree on \(0, 0\).*expects '7zzzzzzzz'.*expects 's00000000'/);
+});
+
+test('geohash-vector-parity: quiet when both suites carry the same precision-9 vectors', () => {
+  assert.deepEqual(geohashVectorParity.run(ctxOf(vectorFiles(GEOHASH_DART(), GEOHASH_TS()))), []);
+});
+
+test('geohash-vector-parity: fires when a suite stops carrying precision-9 vectors', () => {
+  const findings = geohashVectorParity.run(ctxOf(vectorFiles(
+    GEOHASH_DART(),
+    "it('encodes at the default precision', () => {\n  expect(geohashForLocation([0, 0])).toBe('7zzzzzzzzz');\n});",
+  )));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /no precision-9 known vectors found/);
+});
+
+test('geohash-vector-parity: fires when a suite moves out from under the guard', () => {
+  const files = vectorFiles(GEOHASH_DART(), GEOHASH_TS());
+  delete files['app/test/geohash_test.dart'];
+  const findings = geohashVectorParity.run(ctxOf(files));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /cannot read app\/test\/geohash_test\.dart/);
+});
+
+test('geohash-vector-parity: quiet on the real repo', () => {
+  assert.deepEqual(geohashVectorParity.run(realCtx()), []);
 });
