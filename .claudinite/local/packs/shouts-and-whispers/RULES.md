@@ -38,11 +38,14 @@ with `geofire-common`. They must produce **identical** strings, including at bis
 midpoints — both use a strict `>` comparison, which puts a coordinate exactly on a midpoint
 in the lower half-cell. That agreement is what the known-vector suites on both sides exist
 for (`app/test/geohash_test.dart` and `firebase/functions/test/geohash-compat.test.ts` carry
-the *same* vectors deliberately); touching either encoder means re-running both, and
-extending one vector list means extending the other.
+the *same* vectors deliberately); touching either encoder means re-running both. A vector
+asserted on one side alone is a coordinate nobody ever compared — both suites stay green,
+in different languages under different runners, while the claim quietly stops covering it.
 
-The matching *precision* is mechanical and is checked (`geohash-precision-parity`); the
-matching *encoding* is not, which is why it is stated here.
+The matching *precision* is mechanical and is checked (`geohash-precision-parity`), as is
+the *pairing of the vectors* the two suites carry (`geohash-vector-parity`); the matching
+*encoding* is not — no scan can run one encoder against the other, which is the whole
+reason the suites exist — and that is why it is stated here.
 
 ## One table, two copies
 
