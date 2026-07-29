@@ -11,11 +11,17 @@
 import crossTierConstants from './cross-tier-constants.mjs';
 import geohashPrecisionParity from './geohash-precision-parity.mjs';
 import geohashVectorParity from './geohash-vector-parity.mjs';
+import recipientCountParity from './recipient-count-parity.mjs';
 
 export default {
   id: 'shouts-and-whispers',
   detect: null,
   marker: null,
   prose: 'RULES.md',
-  rules: [crossTierConstants, geohashPrecisionParity, geohashVectorParity],
+  rules: [
+    crossTierConstants,
+    geohashPrecisionParity,
+    geohashVectorParity,
+    recipientCountParity,
+  ],
 };

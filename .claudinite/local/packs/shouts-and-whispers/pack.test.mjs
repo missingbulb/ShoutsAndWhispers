@@ -18,6 +18,7 @@ import { execFileSync } from 'node:child_process';
 import crossTierConstants from './cross-tier-constants.mjs';
 import geohashPrecisionParity from './geohash-precision-parity.mjs';
 import geohashVectorParity from './geohash-vector-parity.mjs';
+import recipientCountParity from './recipient-count-parity.mjs';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 
@@ -214,4 +215,112 @@ test('geohash-vector-parity: fires when a suite moves out from under the guard',
 
 test('geohash-vector-parity: quiet on the real repo', () => {
   assert.deepEqual(geohashVectorParity.run(realCtx()), []);
+});
+
+// The sender's seat and the count that excludes it. The fixtures carry the
+// candidate loop too — including a non-sender `recipients.push(...)` — so they
+// prove the guard counts the SEEDED seats and not every recipient the function
+// can produce.
+const RECIPIENTS_TS = (seed) => `
+export function selectRecipients(
+  candidates: readonly Candidate[],
+  center: [number, number],
+  radiusM: number,
+  nowMs: number,
+  senderUid: string,
+): Recipient[] {
+  const recipients: Recipient[] = ${seed};
+  const freshnessCutoffMs = nowMs - PRESENCE_TTL_MS;
+
+  for (const candidate of candidates) {
+    if (candidate.uid === senderUid) continue;
+    recipients.push({ uid: candidate.uid, distanceM: Math.round(distanceM), isOwn: false });
+  }
+
+  return recipients;
+}
+`;
+
+const SENDER_SEAT = '[{ uid: senderUid, distanceM: 0, isOwn: true }]';
+
+const INDEX_TS = (derivation) => `
+  const recipients = selectRecipients(candidates, [lat, lng], radiusM, nowMs, uid);
+  const recipientCount = ${derivation};
+`;
+
+const countFiles = (seed, derivation) => ({
+  'firebase/functions/src/recipients.ts': RECIPIENTS_TS(seed),
+  'firebase/functions/src/index.ts': INDEX_TS(derivation),
+});
+
+test('recipient-count-parity: fires when the sender stops being seeded but the count still subtracts them', () => {
+  const findings = recipientCountParity.run(ctxOf(countFiles('[]', 'recipients.length - 1')));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'firebase/functions/src/index.ts');
+  assert.match(findings[0].what, /subtracts 1 from the recipient list, but .* seeds 0 sender seats/);
+  assert.equal(findings[0].severity, 'blocking');
+});
+
+test('recipient-count-parity: fires when the count stops excluding the seeded sender', () => {
+  const findings = recipientCountParity.run(ctxOf(countFiles(SENDER_SEAT, 'recipients.length')));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /subtracts 0 from the recipient list, but .* seeds 1 sender seat\b/);
+  assert.equal(findings[0].line, 3);
+});
+
+test('recipient-count-parity: fires when the seeded sender loses their own-copy marking', () => {
+  const findings = recipientCountParity.run(ctxOf(countFiles(
+    '[{ uid: senderUid, distanceM: 0, isOwn: false }]',
+    'recipients.length - 1',
+  )));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'firebase/functions/src/recipients.ts');
+  assert.match(findings[0].what, /not marked `isOwn: true`/);
+});
+
+test('recipient-count-parity: quiet when the seat and the subtraction agree', () => {
+  assert.deepEqual(
+    recipientCountParity.run(ctxOf(countFiles(SENDER_SEAT, 'recipients.length - 1'))),
+    [],
+  );
+});
+
+test('recipient-count-parity: fires when the seat is pushed after the declaration instead of seeded in it', () => {
+  // Seeding AT THE DECLARATION is what makes the seat unconditional by
+  // construction, so a push-based refactor is a finding, not a silent pass.
+  const findings = recipientCountParity.run(ctxOf(countFiles(
+    '[];\n  recipients.push({ uid: senderUid, distanceM: 0, isOwn: true })',
+    'recipients.length - 1',
+  )));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /seeds 0 sender seats/);
+});
+
+test('recipient-count-parity: fires when the count is no longer derived from the list length', () => {
+  const findings = recipientCountParity.run(ctxOf(countFiles(SENDER_SEAT, 'candidates.length')));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'firebase/functions/src/index.ts');
+  assert.match(findings[0].what, /no longer derived from the recipient list length/);
+});
+
+test('recipient-count-parity: fires when a guarded file moves out from under the guard', () => {
+  const files = countFiles(SENDER_SEAT, 'recipients.length - 1');
+  delete files['firebase/functions/src/recipients.ts'];
+  const findings = recipientCountParity.run(ctxOf(files));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /cannot read firebase\/functions\/src\/recipients\.ts/);
+});
+
+test('recipient-count-parity: fires when the list is no longer seeded at its declaration', () => {
+  const files = countFiles(SENDER_SEAT, 'recipients.length - 1');
+  files['firebase/functions/src/recipients.ts'] =
+    files['firebase/functions/src/recipients.ts'].replace(/const recipients: Recipient\[\] = .*/,
+      'const recipients = buildRecipients(senderUid);');
+  const findings = recipientCountParity.run(ctxOf(files));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /no longer finds the `recipients` list being seeded at its declaration/);
+});
+
+test('recipient-count-parity: quiet on the real repo', () => {
+  assert.deepEqual(recipientCountParity.run(realCtx()), []);
 });
