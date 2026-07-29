@@ -1,5 +1,7 @@
 # Shouts & Whispers
 
+<!-- claudinite:packs -->![spec-driven-product](../../../../../tmp/claudinite-canon-4RNnUi/packs/spec-driven-product/badge.svg "spec-driven-product") ![executable-requirements](../../../../../tmp/claudinite-canon-4RNnUi/packs/executable-requirements/badge.svg "executable-requirements") ![flutter](../../../../../tmp/claudinite-canon-4RNnUi/packs/flutter/badge.svg "flutter") ![android](../../../../../tmp/claudinite-canon-4RNnUi/packs/android/badge.svg "android") ![ios](../../../../../tmp/claudinite-canon-4RNnUi/packs/ios/badge.svg "ios") ![firebase](../../../../../tmp/claudinite-canon-4RNnUi/packs/firebase/badge.svg "firebase") ![node](../../../../../tmp/claudinite-canon-4RNnUi/packs/node/badge.svg "node") ![basics](../../../../../tmp/claudinite-canon-4RNnUi/packs/basics/badge.svg "basics") ![barriers](../../../../../tmp/claudinite-canon-4RNnUi/packs/barriers/badge.svg "barriers") ![git-github](../../../../../tmp/claudinite-canon-4RNnUi/packs/git-github/badge.svg "git-github") ![tidy-repo](../../../../../tmp/claudinite-canon-4RNnUi/packs/tidy-repo/badge.svg "tidy-repo") ![grow_with_claudinite](../../../../../tmp/claudinite-canon-4RNnUi/packs/grow_with_claudinite/badge.svg "grow_with_claudinite")<!-- /claudinite:packs -->
+
 A hyperlocal messaging app. When you send a message, it is delivered to exactly
 the people who were physically near you at the moment you sent it — a
 **whisper** reaches 150 m, a **shout** reaches 1,500 m — and never to anyone
