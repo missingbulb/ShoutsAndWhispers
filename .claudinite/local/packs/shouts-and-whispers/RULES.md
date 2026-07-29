@@ -36,11 +36,8 @@ The client encodes presence geohashes with a hand-rolled encoder
 (`app/lib/geo/geohash.dart`, ~30 lines, no dependency); the server encodes and range-queries
 with `geofire-common`. They must produce **identical** strings, including at bisection
 midpoints — both use a strict `>` comparison, which puts a coordinate exactly on a midpoint
-in the lower half-cell. That agreement is what the known-vector suites on both sides exist
-for (`app/test/geohash_test.dart` and `firebase/functions/test/geohash-compat.test.ts` carry
-the *same* vectors deliberately); touching either encoder means re-running both. A vector
-asserted on one side alone is a coordinate nobody ever compared — both suites stay green,
-in different languages under different runners, while the claim quietly stops covering it.
+in the lower half-cell. Touching either encoder means re-running both known-vector suites
+(`app/test/geohash_test.dart`, `firebase/functions/test/geohash-compat.test.ts`).
 
 The matching *precision* is mechanical and is checked (`geohash-precision-parity`), as is
 the *pairing of the vectors* the two suites carry (`geohash-vector-parity`); the matching
