@@ -23,7 +23,8 @@
     },
     "tidy-repo",
     "grow_with_claudinite",
-    "local/shouts-and-whispers"
+    "local/shouts-and-whispers",
+    "local/claudinite-runs"
   ],
   "accept": [
     {
