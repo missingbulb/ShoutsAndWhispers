@@ -18,11 +18,12 @@ file is how to keep from breaking it by accident.
   `firebase/functions/src/recipients.ts` — haversine distance ≤ radius **and** fresh —
   before it becomes a recipient. Any future change that widens, caches, or short-circuits
   the query keeps the post-filter, or the radius stops meaning anything.
-- **The sender is a recipient unconditionally.** `selectRecipients` seeds the list with the
-  sender (`distanceM: 0`, `isOwn: true`) before it looks at a single candidate — the
-  sender's own copy does not depend on their presence doc existing or being fresh
-  (DESIGN.md §1.5). `recipientCount` is therefore `recipients.length - 1`, and the two
-  facts move together: change one and the count reported to the sender starts lying.
+- **The sender is a recipient unconditionally** — their own copy does not depend on their
+  presence doc existing or being fresh (DESIGN.md §1.5), which is the one case delivery
+  decides without consulting presence at all. That seed is also why the count reported back
+  to the sender excludes one recipient; the seed and the offset sit in different files, so
+  they can drift into a count that quietly lies. Both halves are static, and the
+  `sender-always-recipient` check now owns them.
 - **A stale heartbeat means absent, with no fallback.** `PRESENCE_TTL_MS` is the entire
   definition of "known to be near" (DESIGN.md §1.2). A user whose last position is older
   than the cutoff is not a recipient — never "their last known position, probably still

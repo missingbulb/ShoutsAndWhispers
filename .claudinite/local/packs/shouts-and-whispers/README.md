@@ -17,8 +17,9 @@ homes: `flutter`, `firebase`, `node`, `android`, `ios` own their platforms,
 | Cross-tier constants agree | blocking | the constants both tiers carry hold the same value, and match `docs/DESIGN.md` §10 |
 | Geohash precision matches | blocking | client heartbeat and `sendMessage` encode presence geohashes at the same precision |
 | Geohash vectors stay paired | blocking | the two tiers' known-vector suites carry the same precision-9 vectors, with the same expectations |
+| Sender always a recipient | blocking | `selectRecipients` seeds the sender unconditionally, and `recipientCount` subtracts exactly that seed |
 
-All three carry a staleness guard: if a guarded declaration or call site is renamed or moved out
+All four carry a staleness guard: if a guarded declaration or call site is renamed or moved out
 of the scanned tree, the check says so instead of quietly passing.
 
 `cross-tier-constants` is deliberately *not* the canon `shared-constants` guard: that one
@@ -30,7 +31,7 @@ only covers values someone remembered to declare. Pairing by name needs no per-v
 
 | Section (≤5 words) | How enforced |
 |---|---|
-| Delivery decides the audience twice | prose (candidate query + post-filter, sender always included, stale means absent) |
+| Delivery decides the audience twice | prose (candidate query + post-filter, stale means absent) + the `sender-always-recipient` check |
 | Two encoders, one contract | prose (the encoders' agreement itself) + the `geohash-precision-parity` and `geohash-vector-parity` checks |
 | One table, two copies | prose + the `cross-tier-constants` check |
 
@@ -40,7 +41,7 @@ only covers values someone remembered to declare. Pairing by name needs no per-v
 node --test .claudinite/local/packs/shouts-and-whispers/pack.test.mjs
 ```
 
-Sixteen cases: each check red on a violating fixture, quiet on a clean one, red on its
+Twenty-eight cases: each check red on a violating fixture, quiet on a clean one, red on its
 staleness case, and quiet when run against the real repo tree (so a check that stops
 matching the project's actual files fails here instead of passing vacuously).
 

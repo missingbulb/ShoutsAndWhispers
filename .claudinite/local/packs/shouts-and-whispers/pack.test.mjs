@@ -18,6 +18,7 @@ import { execFileSync } from 'node:child_process';
 import crossTierConstants from './cross-tier-constants.mjs';
 import geohashPrecisionParity from './geohash-precision-parity.mjs';
 import geohashVectorParity from './geohash-vector-parity.mjs';
+import senderAlwaysRecipient from './sender-always-recipient.mjs';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 
@@ -214,4 +215,141 @@ test('geohash-vector-parity: fires when a suite moves out from under the guard',
 
 test('geohash-vector-parity: quiet on the real repo', () => {
   assert.deepEqual(geohashVectorParity.run(realCtx()), []);
+});
+
+// The sender seed and the count that subtracts it. Each fixture carries the
+// candidate loop's own `isOwn: false` push as well, so the fixtures prove the
+// guard reads the array INITIALIZER (the one place a seed is unconditional) and
+// not every recipient-shaped object literal in the file.
+const RECIPIENTS_TS = (seed) => `
+import { distanceBetween } from 'geofire-common';
+import { PRESENCE_TTL_MS } from './constants';
+
+export function selectRecipients(
+  candidates: readonly Candidate[],
+  center: [number, number],
+  radiusM: number,
+  nowMs: number,
+  senderUid: string,
+): Recipient[] {
+  const recipients: Recipient[] = [${seed}];
+  const freshnessCutoffMs = nowMs - PRESENCE_TTL_MS;
+  for (const candidate of candidates) {
+    if (candidate.updatedAtMs < freshnessCutoffMs) continue;
+    recipients.push({ uid: candidate.uid, distanceM: 1, isOwn: false });
+  }
+  return recipients;
+}
+`;
+
+const SENDER_SEED = '{ uid: senderUid, distanceM: 0, isOwn: true }';
+
+const INDEX_TS = (countExpr) => `
+  const recipients = selectRecipients(candidates, [lat, lng], radiusM, nowMs, uid);
+  const recipientCount = ${countExpr};
+  return { messageId: messageRef.id, recipientCount };
+`;
+
+const senderFiles = (seed, countExpr) => ({
+  'firebase/functions/src/recipients.ts': RECIPIENTS_TS(seed),
+  'firebase/functions/src/index.ts': INDEX_TS(countExpr),
+});
+
+test('sender-always-recipient: quiet when the sender is seeded and the count subtracts one', () => {
+  assert.deepEqual(
+    senderAlwaysRecipient.run(ctxOf(senderFiles(SENDER_SEED, 'recipients.length - 1'))),
+    [],
+  );
+});
+
+test('sender-always-recipient: fires when the sender seed is dropped altogether', () => {
+  const findings = senderAlwaysRecipient.run(ctxOf(senderFiles('', 'recipients.length - 1')));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'firebase/functions/src/recipients.ts');
+  assert.match(findings[0].what, /adds no unconditional sender recipient/);
+  assert.equal(findings[0].severity, 'blocking');
+});
+
+// The seed's spelling is not the rule — its unconditionality is. An empty
+// initializer plus a top-level push is the same guarantee and must stay quiet;
+// the same push behind a condition (with or without braces) must fire.
+const seededByPush = (guard) => {
+  const files = senderFiles(SENDER_SEED, 'recipients.length - 1');
+  files['firebase/functions/src/recipients.ts'] = RECIPIENTS_TS('').replace(
+    '  const freshnessCutoffMs',
+    `  ${guard}recipients.push({ uid: senderUid, distanceM: 0, isOwn: true });\n  const freshnessCutoffMs`,
+  );
+  return files;
+};
+
+test('sender-always-recipient: quiet when the sender is pushed at the top of the body', () => {
+  assert.deepEqual(senderAlwaysRecipient.run(ctxOf(seededByPush(''))), []);
+});
+
+test('sender-always-recipient: fires when the sender push sits behind a braceless if', () => {
+  const findings = senderAlwaysRecipient.run(ctxOf(seededByPush('if (senderPresent) ')));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'firebase/functions/src/recipients.ts');
+  assert.match(findings[0].what, /sender-shaped entry sits behind a condition/);
+});
+
+test('sender-always-recipient: fires when the sender push sits inside a block', () => {
+  const files = senderFiles(SENDER_SEED, 'recipients.length - 1');
+  files['firebase/functions/src/recipients.ts'] = RECIPIENTS_TS('').replace(
+    '  const freshnessCutoffMs',
+    '  if (senderPresent) {\n    recipients.push({ uid: senderUid, distanceM: 0, isOwn: true });\n  }\n  const freshnessCutoffMs',
+  );
+  const findings = senderAlwaysRecipient.run(ctxOf(files));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /sender-shaped entry sits behind a condition/);
+});
+
+test('sender-always-recipient: fires when the count stops excluding the sender', () => {
+  const findings = senderAlwaysRecipient.run(ctxOf(senderFiles(SENDER_SEED, 'recipients.length')));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'firebase/functions/src/index.ts');
+  assert.match(findings[0].what, /seeds 1 recipient \(the sender\) but recipientCount subtracts 0.*off by 1/);
+});
+
+test('sender-always-recipient: fires when the count subtracts more than the seed', () => {
+  const findings = senderAlwaysRecipient.run(ctxOf(senderFiles(SENDER_SEED, 'recipients.length - 2')));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /subtracts 2.*off by 1/);
+});
+
+test('sender-always-recipient: fires when the count is taken from another array', () => {
+  const findings = senderAlwaysRecipient.run(ctxOf(senderFiles(SENDER_SEED, 'candidates.length - 1')));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /counts `candidates` but selectRecipients returns `recipients`/);
+});
+
+test('sender-always-recipient: fires when selectRecipients moves out from under the guard', () => {
+  const files = senderFiles(SENDER_SEED, 'recipients.length - 1');
+  files['firebase/functions/src/recipients.ts'] =
+    RECIPIENTS_TS(SENDER_SEED).replace('function selectRecipients(', 'function chooseAudience(');
+  const findings = senderAlwaysRecipient.run(ctxOf(files));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /no selectRecipients\(\.\.\.\) declaration found/);
+});
+
+test('sender-always-recipient: fires when the count expression moves out from under the guard', () => {
+  const findings = senderAlwaysRecipient.run(ctxOf(senderFiles(
+    SENDER_SEED,
+    'countRecipients(recipients)',
+  )));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'firebase/functions/src/index.ts');
+  assert.match(findings[0].what, /no `recipientCount = <recipients>\.length \[- n\]` expression found/);
+});
+
+test('sender-always-recipient: fires when a guarded file is unreadable', () => {
+  const files = senderFiles(SENDER_SEED, 'recipients.length - 1');
+  delete files['firebase/functions/src/index.ts'];
+  const findings = senderAlwaysRecipient.run(ctxOf(files));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /cannot read firebase\/functions\/src\/index\.ts/);
+});
+
+test('sender-always-recipient: quiet on the real repo', () => {
+  assert.deepEqual(senderAlwaysRecipient.run(realCtx()), []);
 });
