@@ -33,6 +33,7 @@ only covers values someone remembered to declare. Pairing by name needs no per-v
 | Delivery decides the audience twice | prose (candidate query + post-filter, sender always included, stale means absent) |
 | Two encoders, one contract | prose (the encoders' agreement itself) + the `geohash-precision-parity` and `geohash-vector-parity` checks |
 | One table, two copies | prose + the `cross-tier-constants` check |
+| What earns a check here | prose (the pack's own scope bar: reconcile copies, never dictate behaviour) |
 
 ## Fixtures
 

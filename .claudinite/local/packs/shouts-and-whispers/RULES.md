@@ -54,6 +54,26 @@ constant is a four-part change: the §10 row, the server copy, the client copy, 
 constant only one tier needs (the send cooldown, the heartbeat cadence) stays out of `PAIRS`
 on purpose: it cannot drift, because there is nothing to drift from.
 
+## What earns a check here
+
+A check in this pack reconciles two committed transcriptions of **one datum** — a constant,
+a precision literal, a vector table — and dictates no value, shape, or behaviour. Its
+finding reads *"make the copies agree"*, never *"restore this behaviour"*. A candidate whose
+finding would command product behaviour is a feature test in disguise: the tier's own suite
+owns it (`firebase/functions/test/recipients.test.ts`, `app/test/`), and the rule stays
+prose here. Packs hold process rules, never product requirements.
+
+The sender-seed / `recipientCount` rule above is the settled case, and it is **not
+convertible**: any check for it enforces the seat's existence and its `isOwn` / `distanceM`
+marking rather than parity between two copies of one datum. It has been converted and
+rejected twice (PRs #32, #45). It stays prose — do not re-attempt it.
+
+Both rejections came from independent re-derivation, not from ignoring a known verdict:
+each run picked the same rule, built it out, and only then read the prior-run comments on
+the `Claudinite tracker: Prose to Checks` issue. Read those comments *before* authoring a
+conversion; a rejection recorded there is settled, whatever a fresh reading of the prose
+suggests.
+
 ## Running the pack's checks
 
 ```sh
