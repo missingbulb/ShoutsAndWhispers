@@ -1,5 +1,7 @@
 # Shouts & Whispers
 
+<!-- claudinite:packs -->![spec-driven-product](.claudinite/shared/packs/spec-driven-product/badge.svg "spec-driven-product") ![executable-requirements](.claudinite/shared/packs/executable-requirements/badge.svg "executable-requirements") ![flutter](.claudinite/shared/packs/flutter/badge.svg "flutter") ![android](.claudinite/shared/packs/android/badge.svg "android") ![ios](.claudinite/shared/packs/ios/badge.svg "ios") ![firebase](.claudinite/shared/packs/firebase/badge.svg "firebase") ![node](.claudinite/shared/packs/node/badge.svg "node") ![basics](.claudinite/shared/packs/basics/badge.svg "basics") ![barriers](.claudinite/shared/packs/barriers/badge.svg "barriers") ![git-github](.claudinite/shared/packs/git-github/badge.svg "git-github") ![tidy-repo](.claudinite/shared/packs/tidy-repo/badge.svg "tidy-repo") ![grow_with_claudinite](.claudinite/shared/packs/grow_with_claudinite/badge.svg "grow_with_claudinite")<!-- /claudinite:packs -->
+
 A hyperlocal messaging app. When you send a message, it is delivered to exactly
 the people who were physically near you at the moment you sent it — a
 **whisper** reaches 150 m, a **shout** reaches 1,500 m — and never to anyone

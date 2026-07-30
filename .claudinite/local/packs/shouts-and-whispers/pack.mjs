@@ -14,8 +14,12 @@ import geohashVectorParity from './geohash-vector-parity.mjs';
 
 export default {
   id: 'shouts-and-whispers',
+  ruleRoutingGuidance: {
+    belongs: 'the cross-tier delivery contract between the Flutter client and Cloud Functions — shared constants, geohash parity',
+    excludes: 'single-platform concerns — those are flutter, firebase and node',
+  },
   detect: null,
   marker: null,
   prose: 'RULES.md',
-  rules: [crossTierConstants, geohashPrecisionParity, geohashVectorParity],
+  worldRules: [crossTierConstants, geohashPrecisionParity, geohashVectorParity],
 };
