@@ -15,10 +15,11 @@ homes: `flutter`, `firebase`, `node`, `android`, `ios` own their platforms,
 | Rule (≤5 words) | Severity | What |
 |---|---|---|
 | Cross-tier constants agree | blocking | the constants both tiers carry hold the same value, and match `docs/DESIGN.md` §10 |
+| Every cross-tier constant guarded | blocking | a constant declared on both tiers is listed in `cross-tier-constants`' `PAIRS` map, so something is comparing the copies |
 | Geohash precision matches | blocking | client heartbeat and `sendMessage` encode presence geohashes at the same precision |
 | Geohash vectors stay paired | blocking | the two tiers' known-vector suites carry the same precision-9 vectors, with the same expectations |
 
-All three carry a staleness guard: if a guarded declaration or call site is renamed or moved out
+All four carry a staleness guard: if a guarded declaration or call site is renamed or moved out
 of the scanned tree, the check says so instead of quietly passing.
 
 `cross-tier-constants` is deliberately *not* the canon `shared-constants` guard: that one
@@ -32,7 +33,7 @@ only covers values someone remembered to declare. Pairing by name needs no per-v
 |---|---|
 | Delivery decides the audience twice | prose (candidate query + post-filter, sender always included, stale means absent) |
 | Two encoders, one contract | prose (the encoders' agreement itself) + the `geohash-precision-parity` and `geohash-vector-parity` checks |
-| One table, two copies | prose + the `cross-tier-constants` check |
+| One table, two copies | prose (the §10 row, and why a single-tier constant stays out of `PAIRS`) + the `cross-tier-constants` and `cross-tier-constant-coverage` checks |
 | What earns a check here | prose (the pack's own scope bar: reconcile copies, never dictate behaviour) |
 
 ## Fixtures
@@ -41,7 +42,7 @@ only covers values someone remembered to declare. Pairing by name needs no per-v
 node --test .claudinite/local/packs/shouts-and-whispers/pack.test.mjs
 ```
 
-Sixteen cases: each check red on a violating fixture, quiet on a clean one, red on its
+Twenty-four cases: each check red on a violating fixture, quiet on a clean one, red on its
 staleness case, and quiet when run against the real repo tree (so a check that stops
 matching the project's actual files fails here instead of passing vacuously).
 

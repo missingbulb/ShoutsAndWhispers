@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 import crossTierConstants from './cross-tier-constants.mjs';
+import crossTierConstantCoverage from './cross-tier-constant-coverage.mjs';
 import geohashPrecisionParity from './geohash-precision-parity.mjs';
 import geohashVectorParity from './geohash-vector-parity.mjs';
 
@@ -97,6 +98,106 @@ test('cross-tier-constants: fires when a guarded constant is renamed away', () =
 
 test('cross-tier-constants: quiet on the real repo', () => {
   assert.deepEqual(crossTierConstants.run(realCtx()), []);
+});
+
+// The coverage guard's subject is the PAIRS map itself, so its fixtures carry a
+// stand-in for the guard module alongside the two tiers' constants files. The
+// server-only constant (PRESENCE_TTL_MS) and the client-only one
+// (heartbeatInterval) are in every fixture on purpose: they must stay quiet by
+// construction, never by exemption.
+const GUARD_MJS = (extraPairs = '') => `
+const PAIRS = [
+  { server: 'WHISPER_RADIUS_M', client: 'whisperRadiusM' },
+  { server: 'SHOUT_RADIUS_M', client: 'shoutRadiusM' },
+  { server: 'MAX_TEXT_LEN', client: 'maxTextLen' },
+  { server: 'REGION', client: 'functionsRegion' },${extraPairs}
+];
+`;
+
+const COVERAGE_TS = (extra = '') => `
+export const WHISPER_RADIUS_M = 150;
+export const SHOUT_RADIUS_M = 1500;
+export const PRESENCE_TTL_MS = 5 * 60 * 1000;
+export const MAX_TEXT_LEN = 500;
+export const REGION = 'us-central1';${extra}
+`;
+
+const COVERAGE_DART = (extra = '') => `
+const int whisperRadiusM = 150;
+const int shoutRadiusM = 1500;
+const int maxTextLen = 500;
+const Duration heartbeatInterval = Duration(minutes: 2);
+const String functionsRegion = 'us-central1';${extra}
+`;
+
+const coverageFiles = (server, client, guard) => ({
+  'firebase/functions/src/constants.ts': server,
+  'app/lib/config.dart': client,
+  '.claudinite/local/packs/shouts-and-whispers/cross-tier-constants.mjs': guard,
+});
+
+test('cross-tier-constant-coverage: fires when a both-tier constant is left out of PAIRS', () => {
+  const findings = crossTierConstantCoverage.run(ctxOf(coverageFiles(
+    COVERAGE_TS('\nexport const MAX_IMAGE_BYTES = 2048;'),
+    COVERAGE_DART('\nconst int maxImageBytes = 2048;'),
+    GUARD_MJS(),
+  )));
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].severity, 'blocking');
+  assert.match(findings[0].what, /MAX_IMAGE_BYTES is declared in .* and maxImageBytes in .* absent from the PAIRS map/);
+  assert.match(findings[0].fix, /add \{ server: 'MAX_IMAGE_BYTES', client: 'maxImageBytes' \} to PAIRS/);
+});
+
+test('cross-tier-constant-coverage: quiet when the new pair is added to PAIRS', () => {
+  assert.deepEqual(crossTierConstantCoverage.run(ctxOf(coverageFiles(
+    COVERAGE_TS('\nexport const MAX_IMAGE_BYTES = 2048;'),
+    COVERAGE_DART('\nconst int maxImageBytes = 2048;'),
+    GUARD_MJS("\n  { server: 'MAX_IMAGE_BYTES', client: 'maxImageBytes' },"),
+  ))), []);
+});
+
+test('cross-tier-constant-coverage: quiet when every both-tier constant is listed', () => {
+  assert.deepEqual(crossTierConstantCoverage.run(ctxOf(coverageFiles(
+    COVERAGE_TS(), COVERAGE_DART(), GUARD_MJS(),
+  ))), []);
+});
+
+test('cross-tier-constant-coverage: quiet for a new server-only constant', () => {
+  // No client counterpart to find, so it is never a candidate — the "stays out
+  // of PAIRS on purpose" case holds by construction, not by a name list.
+  assert.deepEqual(crossTierConstantCoverage.run(ctxOf(coverageFiles(
+    COVERAGE_TS('\nexport const RETRY_LIMIT = 3;'),
+    COVERAGE_DART(),
+    GUARD_MJS(),
+  ))), []);
+});
+
+test('cross-tier-constant-coverage: fires when the PAIRS map stops being findable', () => {
+  const findings = crossTierConstantCoverage.run(ctxOf(coverageFiles(
+    COVERAGE_TS(), COVERAGE_DART(), 'const PAIRS = [];\n',
+  )));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /no PAIRS entries found/);
+});
+
+test('cross-tier-constant-coverage: fires when the guard module moves out from under it', () => {
+  const files = coverageFiles(COVERAGE_TS(), COVERAGE_DART(), GUARD_MJS());
+  delete files['.claudinite/local/packs/shouts-and-whispers/cross-tier-constants.mjs'];
+  const findings = crossTierConstantCoverage.run(ctxOf(files));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /cannot read .*cross-tier-constants\.mjs/);
+});
+
+test('cross-tier-constant-coverage: fires when the server constants stop being findable', () => {
+  const findings = crossTierConstantCoverage.run(ctxOf(coverageFiles(
+    'const WHISPER_RADIUS_M = 150;\n', COVERAGE_DART(), GUARD_MJS(),
+  )));
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].what, /no exported constants found/);
+});
+
+test('cross-tier-constant-coverage: quiet on the real repo', () => {
+  assert.deepEqual(crossTierConstantCoverage.run(realCtx()), []);
 });
 
 const geohashFiles = (clientPrecision, serverPrecision) => ({
