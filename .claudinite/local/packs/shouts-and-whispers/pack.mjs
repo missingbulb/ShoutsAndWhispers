@@ -9,6 +9,7 @@
 // and `marker` stay null; it activates from the `local/shouts-and-whispers`
 // token in .claudinite-checks.json.
 import crossTierConstants from './cross-tier-constants.mjs';
+import crossTierConstantCoverage from './cross-tier-constant-coverage.mjs';
 import geohashPrecisionParity from './geohash-precision-parity.mjs';
 import geohashVectorParity from './geohash-vector-parity.mjs';
 
@@ -21,5 +22,10 @@ export default {
   detect: null,
   marker: null,
   prose: 'RULES.md',
-  worldRules: [crossTierConstants, geohashPrecisionParity, geohashVectorParity],
+  worldRules: [
+    crossTierConstants,
+    crossTierConstantCoverage,
+    geohashPrecisionParity,
+    geohashVectorParity,
+  ],
 };
