@@ -61,7 +61,7 @@ a precision literal, a vector table — and dictates no value, shape, or behavio
 finding reads *"make the copies agree"*, never *"restore this behaviour"*. A candidate whose
 finding would command product behaviour is a feature test in disguise: the tier's own suite
 owns it (`firebase/functions/test/recipients.test.ts`, `app/test/`), and the rule stays
-prose here. Packs hold process rules, never product requirements.
+prose here.
 
 The sender-seed / `recipientCount` rule above is the settled case, and it is **not
 convertible**: any check for it enforces the seat's existence and its `isOwn` / `distanceM`
