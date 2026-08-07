@@ -1,0 +1,381 @@
+{
+  "version": 1,
+  "foldedThrough": "2026-08-06",
+  "runsFoldedThrough": "2026-08-07T03:40:46Z",
+  "days": {
+    "2026-07-28": {
+      "captures": 1,
+      "merges": 1,
+      "sessions": 1,
+      "userMessages": 1,
+      "userCommands": 0,
+      "skillLoads": {
+        "merge-to-main": 1
+      },
+      "checks": {
+        "work": {
+          "runs": 4,
+          "failures": 1,
+          "errors": 0,
+          "blocking": 1,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        },
+        "world": {
+          "runs": 3,
+          "failures": 0,
+          "errors": 0,
+          "blocking": 0,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {
+        "comment-classification": {
+          "blocking": 1,
+          "advisory": 0
+        }
+      },
+      "tasks": {}
+    },
+    "2026-07-31": {
+      "captures": 5,
+      "merges": 3,
+      "sessions": 3,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {
+        "work": {
+          "runs": 3,
+          "failures": 2,
+          "errors": 0,
+          "blocking": 2,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        },
+        "world": {
+          "runs": 5,
+          "failures": 1,
+          "errors": 0,
+          "blocking": 1,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {
+        "comment-classification": {
+          "blocking": 1,
+          "advisory": 0
+        },
+        "feature-requirements-first": {
+          "blocking": 1,
+          "advisory": 0
+        }
+      },
+      "tasks": {}
+    },
+    "2026-08-01": {
+      "captures": 4,
+      "merges": 2,
+      "sessions": 2,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {
+        "work": {
+          "runs": 1,
+          "failures": 1,
+          "errors": 0,
+          "blocking": 1,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        },
+        "world": {
+          "runs": 2,
+          "failures": 0,
+          "errors": 0,
+          "blocking": 0,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {
+        "comment-classification": {
+          "blocking": 1,
+          "advisory": 0
+        }
+      },
+      "tasks": {}
+    },
+    "2026-08-02": {
+      "captures": 11,
+      "merges": 8,
+      "sessions": 8,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {
+        "work": {
+          "runs": 2,
+          "failures": 2,
+          "errors": 0,
+          "blocking": 2,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        },
+        "world": {
+          "runs": 5,
+          "failures": 0,
+          "errors": 0,
+          "blocking": 0,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {
+        "comment-classification": {
+          "blocking": 2,
+          "advisory": 0
+        }
+      },
+      "tasks": {}
+    },
+    "2026-08-03": {
+      "captures": 2,
+      "merges": 1,
+      "sessions": 1,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {},
+      "checkFindings": {},
+      "tasks": {}
+    },
+    "2026-08-05": {
+      "captures": 1,
+      "merges": 1,
+      "sessions": 1,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {
+        "world": {
+          "runs": 3,
+          "failures": 0,
+          "errors": 0,
+          "blocking": 0,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {},
+      "tasks": {
+        "grow_with_claudinite/usage-fold": {
+          "agent": 0,
+          "preprocess": 1,
+          "skipped": 0,
+          "failed": 0,
+          "deferred": 0
+        },
+        "tidy-repo/tidy-issues": {
+          "agent": 0,
+          "preprocess": 0,
+          "skipped": 1,
+          "failed": 0,
+          "deferred": 0
+        }
+      }
+    },
+    "2026-08-06": {
+      "captures": 1,
+      "merges": 1,
+      "sessions": 1,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {
+        "world": {
+          "runs": 2,
+          "failures": 0,
+          "errors": 0,
+          "blocking": 0,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {},
+      "tasks": {
+        "basics/baselining": {
+          "agent": 1,
+          "preprocess": 0,
+          "skipped": 0,
+          "failed": 0,
+          "deferred": 2
+        },
+        "grow_with_claudinite/growth-extract": {
+          "agent": 0,
+          "preprocess": 0,
+          "skipped": 1,
+          "failed": 0,
+          "deferred": 0
+        },
+        "grow_with_claudinite/usage-fold": {
+          "agent": 0,
+          "preprocess": 0,
+          "skipped": 0,
+          "failed": 0,
+          "deferred": 1
+        },
+        "tidy-repo/tidy-issues": {
+          "agent": 0,
+          "preprocess": 0,
+          "skipped": 1,
+          "failed": 0,
+          "deferred": 0
+        }
+      }
+    },
+    "2026-08-07": {
+      "captures": 1,
+      "merges": 1,
+      "sessions": 1,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {
+        "world": {
+          "runs": 4,
+          "failures": 0,
+          "errors": 0,
+          "blocking": 0,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {},
+      "tasks": {
+        "basics/baselining": {
+          "agent": 1,
+          "preprocess": 0,
+          "skipped": 0,
+          "failed": 0,
+          "deferred": 0
+        },
+        "grow_with_claudinite/growth-extract": {
+          "agent": 0,
+          "preprocess": 0,
+          "skipped": 1,
+          "failed": 0,
+          "deferred": 0
+        }
+      }
+    }
+  },
+  "weeks": {
+    "2026-W31": {
+      "days": 4,
+      "captures": 21,
+      "merges": 14,
+      "sessionDays": 14,
+      "userMessages": 1,
+      "userCommands": 0,
+      "skillLoads": {
+        "merge-to-main": 1
+      },
+      "checks": {
+        "work": {
+          "runs": 10,
+          "failures": 6,
+          "errors": 0,
+          "blocking": 6,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        },
+        "world": {
+          "runs": 15,
+          "failures": 1,
+          "errors": 0,
+          "blocking": 1,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {
+        "comment-classification": {
+          "blocking": 5,
+          "advisory": 0
+        },
+        "feature-requirements-first": {
+          "blocking": 1,
+          "advisory": 0
+        }
+      },
+      "tasks": {}
+    },
+    "2026-W32": {
+      "days": 3,
+      "captures": 4,
+      "merges": 3,
+      "sessionDays": 3,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {
+        "world": {
+          "runs": 5,
+          "failures": 0,
+          "errors": 0,
+          "blocking": 0,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {},
+      "tasks": {
+        "basics/baselining": {
+          "agent": 1,
+          "preprocess": 0,
+          "skipped": 0,
+          "failed": 0,
+          "deferred": 2
+        },
+        "grow_with_claudinite/growth-extract": {
+          "agent": 0,
+          "preprocess": 0,
+          "skipped": 1,
+          "failed": 0,
+          "deferred": 0
+        },
+        "grow_with_claudinite/usage-fold": {
+          "agent": 0,
+          "preprocess": 1,
+          "skipped": 0,
+          "failed": 0,
+          "deferred": 1
+        },
+        "tidy-repo/tidy-issues": {
+          "agent": 0,
+          "preprocess": 0,
+          "skipped": 2,
+          "failed": 0,
+          "deferred": 0
+        }
+      }
+    }
+  }
+}
