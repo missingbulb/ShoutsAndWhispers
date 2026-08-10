@@ -36,8 +36,7 @@ The client encodes presence geohashes with a hand-rolled encoder
 (`app/lib/geo/geohash.dart`, ~30 lines, no dependency); the server encodes and range-queries
 with `geofire-common`. They must produce **identical** strings, including at bisection
 midpoints — both use a strict `>` comparison, which puts a coordinate exactly on a midpoint
-in the lower half-cell. Touching either encoder means re-running both known-vector suites
-(`app/test/geohash_test.dart`, `firebase/functions/test/geohash-compat.test.ts`).
+in the lower half-cell.
 
 The matching *precision* is mechanical and is checked (`geohash-precision-parity`), as is
 the *pairing of the vectors* the two suites carry (`geohash-vector-parity`); the matching
@@ -58,10 +57,7 @@ on purpose: it cannot drift, because there is nothing to drift from.
 
 A check in this pack reconciles two committed transcriptions of **one datum** — a constant,
 a precision literal, a vector table — and dictates no value, shape, or behaviour. Its
-finding reads *"make the copies agree"*, never *"restore this behaviour"*. A candidate whose
-finding would command product behaviour is a feature test in disguise: the tier's own suite
-owns it (`firebase/functions/test/recipients.test.ts`, `app/test/`), and the rule stays
-prose here.
+finding reads *"make the copies agree"*, never *"restore this behaviour"*.
 
 The sender-seed / `recipientCount` rule above is the settled case, and it is **not
 convertible**: any check for it enforces the seat's existence and its `isOwn` / `distanceM`
