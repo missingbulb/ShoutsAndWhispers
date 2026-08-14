@@ -29,7 +29,8 @@
       "config": {
         "repo": "missingbulb/Sheepdog"
       }
-    }
+    },
+    "core"
   ],
   "accept": [
     {
@@ -50,7 +51,7 @@
   "claudinite": {
     "updated": "2026-08-12T23:10:18.000Z",
     "ref": "631a067f5a0413e154a0d4c1a66275f18b255af9",
-    "engineVersion": 3,
+    "engineVersion": 4,
     "packVersions": {
       "spec-driven-product": 1,
       "executable-requirements": 1,
@@ -64,7 +65,8 @@
       "git-github": 1,
       "tidy-repo": 1,
       "grow_with_claudinite": 1,
-      "claude-code-web-users-support": 1
+      "claude-code-web-users-support": 1,
+      "core": 1
     }
   }
 }
