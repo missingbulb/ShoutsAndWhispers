@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "foldedThrough": "2026-08-14",
-  "runsFoldedThrough": "2026-08-15T03:25:18Z",
+  "foldedThrough": "2026-08-15",
+  "runsFoldedThrough": "2026-08-16T04:21:43Z",
   "days": {
     "2026-07-28": {
       "captures": 1,
@@ -1009,6 +1009,13 @@
       "checks": {},
       "checkFindings": {},
       "tasks": {
+        "basics/task-janitor": {
+          "agent": 0,
+          "prework": 1,
+          "skipped": 0,
+          "failed": 0,
+          "deferred": 0
+        },
         "core/update": {
           "agent": 0,
           "prework": 1,
@@ -1022,10 +1029,75 @@
           "skipped": 0,
           "failed": 0,
           "deferred": 0
+        },
+        "grow_with_claudinite/usage-fold": {
+          "agent": 0,
+          "prework": 1,
+          "skipped": 0,
+          "failed": 0,
+          "deferred": 0
+        },
+        "tidy-repo/tidy-issues": {
+          "agent": 0,
+          "prework": 0,
+          "skipped": 1,
+          "failed": 0,
+          "deferred": 0
         }
       },
       "taskExec": {
         "grow_with_claudinite/growth-extract": {
+          "success": 1,
+          "failed": 0,
+          "task-gone": 0,
+          "invalid": 0
+        }
+      }
+    },
+    "2026-08-16": {
+      "captures": 1,
+      "merges": 1,
+      "sessions": 1,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {
+        "work": {
+          "runs": 2,
+          "failures": 1,
+          "errors": 0,
+          "blocking": 1,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        },
+        "world": {
+          "runs": 3,
+          "failures": 0,
+          "errors": 0,
+          "blocking": 0,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {
+        "task-lifecycle": {
+          "blocking": 1,
+          "advisory": 0
+        }
+      },
+      "tasks": {
+        "core/update": {
+          "agent": 1,
+          "prework": 0,
+          "skipped": 0,
+          "failed": 0,
+          "deferred": 0
+        }
+      },
+      "taskExec": {
+        "core/update": {
           "success": 1,
           "failed": 0,
           "task-gone": 0,
@@ -1223,16 +1295,16 @@
       }
     },
     "2026-W33": {
-      "days": 5,
-      "captures": 11,
-      "merges": 11,
-      "sessionDays": 11,
+      "days": 6,
+      "captures": 12,
+      "merges": 12,
+      "sessionDays": 12,
       "userMessages": 0,
       "userCommands": 0,
       "skillLoads": {
-        "extract-from-activity": 1,
-        "extract-from-conversations": 1,
-        "prose-to-checks": 1,
+        "extract-from-activity": 2,
+        "extract-from-conversations": 2,
+        "prose-to-checks": 2,
         "session-start-hook": 1,
         "unattended-agents": 1
       },
@@ -1272,7 +1344,7 @@
         },
         "basics/task-janitor": {
           "agent": 0,
-          "prework": 5,
+          "prework": 6,
           "skipped": 0,
           "failed": 0,
           "deferred": 0
@@ -1286,13 +1358,13 @@
         },
         "core/update": {
           "agent": 0,
-          "prework": 1,
+          "prework": 2,
           "skipped": 0,
           "failed": 0,
           "deferred": 0
         },
         "grow_with_claudinite/growth-extract": {
-          "agent": 1,
+          "agent": 2,
           "prework": 0,
           "skipped": 3,
           "failed": 0,
@@ -1300,7 +1372,7 @@
         },
         "grow_with_claudinite/usage-fold": {
           "agent": 0,
-          "prework": 5,
+          "prework": 6,
           "skipped": 0,
           "failed": 0,
           "deferred": 0
@@ -1308,7 +1380,7 @@
         "tidy-repo/tidy-issues": {
           "agent": 0,
           "prework": 0,
-          "skipped": 5,
+          "skipped": 6,
           "failed": 0,
           "deferred": 0
         }
@@ -1339,7 +1411,7 @@
           "invalid": 0
         },
         "grow_with_claudinite/growth-extract": {
-          "success": 3,
+          "success": 4,
           "failed": 0,
           "task-gone": 0,
           "invalid": 0
