@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "foldedThrough": "2026-08-15",
-  "runsFoldedThrough": "2026-08-16T04:21:43Z",
+  "foldedThrough": "2026-08-16",
+  "runsFoldedThrough": "2026-08-17T03:35:36Z",
   "days": {
     "2026-07-28": {
       "captures": 1,
@@ -1055,12 +1055,14 @@
       }
     },
     "2026-08-16": {
-      "captures": 1,
-      "merges": 1,
-      "sessions": 1,
+      "captures": 3,
+      "merges": 3,
+      "sessions": 3,
       "userMessages": 0,
       "userCommands": 0,
-      "skillLoads": {},
+      "skillLoads": {
+        "generate-project-instructions": 1
+      },
       "checks": {
         "work": {
           "runs": 2,
@@ -1097,6 +1099,41 @@
         }
       },
       "taskExec": {
+        "core/update": {
+          "success": 1,
+          "failed": 0,
+          "task-gone": 0,
+          "invalid": 0
+        }
+      }
+    },
+    "2026-08-17": {
+      "captures": 1,
+      "merges": 1,
+      "sessions": 1,
+      "userMessages": 0,
+      "userCommands": 0,
+      "skillLoads": {},
+      "checks": {
+        "world": {
+          "runs": 2,
+          "failures": 0,
+          "errors": 0,
+          "blocking": 0,
+          "advisory": 0,
+          "ciRuns": 0,
+          "ciFailures": 0
+        }
+      },
+      "checkFindings": {},
+      "tasks": {},
+      "taskExec": {
+        "<pack>/<task>": {
+          "success": 1,
+          "failed": 0,
+          "task-gone": 0,
+          "invalid": 0
+        },
         "core/update": {
           "success": 1,
           "failed": 0,
@@ -1295,31 +1332,32 @@
       }
     },
     "2026-W33": {
-      "days": 6,
-      "captures": 12,
-      "merges": 12,
-      "sessionDays": 12,
+      "days": 7,
+      "captures": 15,
+      "merges": 15,
+      "sessionDays": 15,
       "userMessages": 0,
       "userCommands": 0,
       "skillLoads": {
         "extract-from-activity": 2,
         "extract-from-conversations": 2,
+        "generate-project-instructions": 1,
         "prose-to-checks": 2,
         "session-start-hook": 1,
         "unattended-agents": 1
       },
       "checks": {
         "work": {
-          "runs": 10,
-          "failures": 7,
+          "runs": 12,
+          "failures": 8,
           "errors": 0,
-          "blocking": 7,
+          "blocking": 8,
           "advisory": 0,
           "ciRuns": 0,
           "ciFailures": 0
         },
         "world": {
-          "runs": 13,
+          "runs": 16,
           "failures": 0,
           "errors": 0,
           "blocking": 0,
@@ -1331,6 +1369,10 @@
       "checkFindings": {
         "comment-classification": {
           "blocking": 7,
+          "advisory": 0
+        },
+        "task-lifecycle": {
+          "blocking": 1,
           "advisory": 0
         }
       },
@@ -1357,7 +1399,7 @@
           "deferred": 0
         },
         "core/update": {
-          "agent": 0,
+          "agent": 1,
           "prework": 2,
           "skipped": 0,
           "failed": 0,
@@ -1394,6 +1436,12 @@
         },
         "basics/update": {
           "success": 2,
+          "failed": 0,
+          "task-gone": 0,
+          "invalid": 0
+        },
+        "core/update": {
+          "success": 1,
           "failed": 0,
           "task-gone": 0,
           "invalid": 0
