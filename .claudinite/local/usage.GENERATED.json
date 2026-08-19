@@ -1,7 +1,7 @@
 {
   "version": 2,
   "foldedThrough": "2026-08-17",
-  "runsFoldedThrough": "2026-08-18T03:30:52Z",
+  "runsFoldedThrough": "2026-08-19T04:22:31Z",
   "fields": {
     "day": ["captures","merges","sessions","userMessages","userCommands"],
     "week": ["days","captures","merges","sessionDays","userMessages","userCommands"],
@@ -16,7 +16,7 @@
     "2026-08-01": {"totals":[4,2,2,0,0],"checks":{"work":[1,1,0,1,0,0,0],"world":[2,0,0,0,0,0,0]},"checkFindings":{"comment-classification":[1,0]}},
     "2026-08-02": {"totals":[11,8,8,0,0],"checks":{"work":[2,2,0,2,0,0,0],"world":[5,0,0,0,0,0,0]},"checkFindings":{"comment-classification":[2,0]}},
     "2026-08-03": {"totals":[2,1,1,0,0]},
-    "2026-08-05": {"totals":[1,1,1,0,0],"checks":{"world":[3,0,0,0,0,0,0]},"tasks":{"grow_with_claudinite/usage-fold":[0,null,0,0,0],"tidy-repo/tidy-issues":[0,null,1,0,0]}},
+    "2026-08-05": {"totals":[1,1,1,0,0],"checks":{"world":[3,0,0,0,0,0,0]}},
     "2026-08-06": {"totals":[1,1,1,0,0],"checks":{"world":[2,0,0,0,0,0,0]},"tasks":{"basics/baselining":[1,null,0,0,2],"grow_with_claudinite/growth-extract":[0,null,1,0,0],"grow_with_claudinite/usage-fold":[0,null,0,0,1],"tidy-repo/tidy-issues":[0,null,1,0,0]}},
     "2026-08-07": {"totals":[4,3,4,1,0],"checks":{"work":[1,1,0,1,0,0,0],"world":[7,0,0,0,0,0,0]},"checkFindings":{"comment-classification":[1,0]},"tasks":{"basics/baselining":[3,null,0,0,1],"grow_with_claudinite/growth-extract":[0,null,1,0,0],"grow_with_claudinite/usage-fold":[0,1,0,0,0],"tidy-repo/tidy-issues":[0,0,1,0,0]},"taskExec":{"basics/baselining":[2,0,0,0]}},
     "2026-08-08": {"totals":[3,3,3,0,0],"skillLoads":{"session-start-hook":1},"checks":{"work":[1,1,0,1,0,0,0],"world":[1,1,0,1,0,0,0]},"checkFindings":{"comment-classification":[1,0],"config":[1,0]},"tasks":{"basics/baselining":[1,2,0,0,0],"basics/task-janitor":[0,1,0,0,0],"grow_with_claudinite/growth-extract":[1,0,0,0,0],"grow_with_claudinite/usage-fold":[0,1,0,0,0],"tidy-repo/tidy-issues":[1,0,0,0,0]},"taskExec":{"basics/baselining":[3,0,0,0],"grow_with_claudinite/growth-extract":[1,0,0,0],"tidy-repo/tidy-issues":[1,0,0,0]}},
