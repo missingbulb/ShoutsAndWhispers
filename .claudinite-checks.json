@@ -66,13 +66,13 @@
       "ios": 1,
       "firebase": 2,
       "node": 2,
-      "basics": 3,
+      "basics": 5,
       "barriers": 2,
-      "git-github": 2,
-      "tidy-repo": 2,
-      "grow_with_claudinite": 2,
+      "git-github": 3,
+      "tidy-repo": 4,
+      "grow_with_claudinite": 6,
       "claude-code-web-users-support": 2,
-      "core": 3
+      "core": 6
     }
   }
 }
