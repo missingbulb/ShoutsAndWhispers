@@ -66,13 +66,13 @@
       "ios": 2,
       "firebase": 4,
       "node": 2,
-      "basics": 12,
+      "basics": 16,
       "barriers": 2,
-      "git-github": 6,
-      "tidy-repo": 6,
-      "claudinite-growth": 14,
+      "git-github": 8,
+      "tidy-repo": 9,
+      "claudinite-growth": 16,
       "claude-code-web-users-support": 3,
-      "claudinite-lifecycle": 14
+      "claudinite-lifecycle": 16
     }
   }
 }
