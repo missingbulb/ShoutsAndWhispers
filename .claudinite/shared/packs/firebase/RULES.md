@@ -2,8 +2,7 @@
 
 Portable practices for repos built on Firebase (Auth, Firestore, Cloud Functions, FCM). Earned in
 missingbulb/ShoutsAndWhispers; keep product-specific schema in the consuming repo's docs.
-Environment separation (dev/prod projects, App Check, store gating) lives in the opt-in
-[firebase-release](../firebase-release/RULES.md) pack — declare it when shipping gets close.
+Environment separation — dev/prod projects, App Check, store gating — is not this pack's.
 
 ## 1. Security rules are merge-aware and default-deny
 
@@ -68,7 +67,7 @@ Environment separation (dev/prod projects, App Check, store gating) lives in the
   (or pass `--config <dir>/firebase.json`). Keep compiled output (`functions/lib/`) and
   `.firebase/` gitignored.
 - **Commit `.firebaserc` with named aliases and make the default the safe target** (see
-  firebase-release for the full environment discipline). Deploy commands in docs always name
+  the create-release-plan skill for the full environment discipline). Deploy commands in docs always name
   what they deploy (`--only functions,firestore`).
 - **Smoke-load the built entrypoint in the test lane** (`node -e "require('./lib/index.js')"`).
   A Node-major skew between build and runtime, or a bad build, surfaces as a module crash the
