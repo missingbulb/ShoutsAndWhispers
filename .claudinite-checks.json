@@ -57,22 +57,22 @@
   "claudinite": {
     "updated": "2026-08-12T23:10:18.000Z",
     "ref": "631a067f5a0413e154a0d4c1a66275f18b255af9",
-    "engineVersion": 6,
+    "engineVersion": "60820.1",
     "packVersions": {
-      "spec-driven-product": 3,
-      "executable-requirements": 3,
-      "flutter": 2,
-      "android": 2,
-      "ios": 2,
-      "firebase": 4,
-      "node": 2,
-      "basics": 16,
-      "barriers": 2,
-      "git-github": 8,
-      "tidy-repo": 9,
-      "claudinite-growth": 16,
-      "claude-code-web-users-support": 3,
-      "claudinite-lifecycle": 16
+      "spec-driven-product": "60820.1",
+      "executable-requirements": "60820.1",
+      "flutter": "60820.1",
+      "android": "60820.1",
+      "ios": "60820.1",
+      "firebase": "60820.1",
+      "node": "60820.1",
+      "basics": "60820.2",
+      "barriers": "60820.1",
+      "git-github": "60820.1",
+      "tidy-repo": "60820.1",
+      "claudinite-growth": "60820.1",
+      "claude-code-web-users-support": "60820.1",
+      "claudinite-lifecycle": "60820.1"
     }
   }
 }
