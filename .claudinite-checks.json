@@ -66,13 +66,13 @@
       "ios": "60820.1",
       "firebase": "60820.1",
       "node": "60820.1",
-      "basics": "60820.2",
+      "basics": "60820.5",
       "barriers": "60820.1",
-      "git-github": "60820.1",
+      "git-github": "60820.2",
       "tidy-repo": "60820.1",
-      "claudinite-growth": "60820.1",
+      "claudinite-growth": "60820.2",
       "claude-code-web-users-support": "60820.1",
-      "claudinite-lifecycle": "60820.1"
+      "claudinite-lifecycle": "60820.3"
     }
   }
 }
