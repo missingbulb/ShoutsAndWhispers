@@ -64,15 +64,15 @@
       "flutter": "60820.1",
       "android": "60820.1",
       "ios": "60820.1",
-      "firebase": "60820.1",
+      "firebase": "60821.1",
       "node": "60820.1",
       "basics": "60821.4",
       "barriers": "60820.1",
-      "git-github": "60820.2",
+      "git-github": "60821.1",
       "tidy-repo": "60820.1",
-      "claudinite-growth": "60821.1",
-      "claude-code-web-users-support": "60821.1",
-      "claudinite-lifecycle": "60821.2"
+      "claudinite-growth": "60821.2",
+      "claude-code-web-users-support": "60821.2",
+      "claudinite-lifecycle": "60821.3"
     }
   }
 }
