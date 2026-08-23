@@ -1,36 +1,69 @@
 {
   "packs": [
-    "spec-driven-product",
-    "executable-requirements",
-    "flutter",
-    "android",
-    "ios",
-    "firebase",
+    {
+      "id": "spec-driven-product",
+      "version": "60822.1"
+    },
+    {
+      "id": "executable-requirements",
+      "version": "60822.1"
+    },
+    {
+      "id": "flutter",
+      "version": "60822.1"
+    },
+    {
+      "id": "android",
+      "version": "60822.1"
+    },
+    {
+      "id": "ios",
+      "version": "60822.1"
+    },
+    {
+      "id": "firebase",
+      "version": "60822.1"
+    },
     {
       "id": "node",
+      "version": "60823.1",
       "config": {
         "dirs": [
           "firebase/functions"
         ]
       }
     },
-    "basics",
+    {
+      "id": "basics",
+      "version": "60823.1"
+    },
     {
       "id": "barriers",
+      "version": "60823.1",
       "via": [
         "basics"
       ]
     },
-    "tidy-repo",
-    "claudinite-growth",
+    {
+      "id": "tidy-repo",
+      "version": "60823.1"
+    },
+    {
+      "id": "claudinite-growth",
+      "version": "60823.2"
+    },
     "local/shouts-and-whispers",
     {
       "id": "claude-code-web-users-support",
+      "version": "60823.1",
       "config": {
         "repo": "missingbulb/Shepherd"
       }
     },
-    "claudinite-lifecycle"
+    {
+      "id": "claudinite-lifecycle",
+      "version": "60823.1"
+    }
   ],
   "accept": [
     {
@@ -39,12 +72,8 @@
       "reason": "node genuinely applies but its package.json lives at firebase/functions/package.json — two directories down, past the node pack's intentional near-root fingerprint cap (root or one dir down) that keeps nested fixtures from tripping detection. So the declaration is deliberately ahead of the fingerprint here. Every other declared pack fingerprint-matches without acceptance: flutter (app/pubspec.yaml), firebase (firebase/firebase.json, one dir down — now detected since Claudinite PR #190), android (app/android/.../AndroidManifest.xml), ios (app/ios/Runner/Info.plist), executable-requirements (dev/requirements/requirements.md)."
     }
   ],
-  "maintenance": {
-    "delivery": "auto-merge",
-    "mechanism": "versioned"
-  },
   "taskScheduler": {
-    "endpoints": {
+    "agenticTaskInvocationEndpoints": {
       "default": {
         "url": "https://api.anthropic.com/v1/claude_code/routines/trig_01VoSm2pim6PjfD6aBuh3Ahe/fire",
         "tokenSecret": "CCR_ROUTINE_TOKEN"
@@ -54,25 +83,5 @@
     "weeklyDay": "Sun",
     "monthlyDay": 1
   },
-  "claudinite": {
-    "updated": "2026-08-12T23:10:18.000Z",
-    "ref": "631a067f5a0413e154a0d4c1a66275f18b255af9",
-    "engineVersion": "60820.1",
-    "packVersions": {
-      "spec-driven-product": "60820.1",
-      "executable-requirements": "60820.1",
-      "flutter": "60820.1",
-      "android": "60820.1",
-      "ios": "60820.1",
-      "firebase": "60821.1",
-      "node": "60820.1",
-      "basics": "60821.4",
-      "barriers": "60820.1",
-      "git-github": "60821.1",
-      "tidy-repo": "60820.1",
-      "claudinite-growth": "60821.2",
-      "claude-code-web-users-support": "60821.2",
-      "claudinite-lifecycle": "60821.3"
-    }
-  }
+  "engineVersion": "60823.1"
 }
