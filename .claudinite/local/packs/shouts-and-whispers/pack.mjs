@@ -7,7 +7,7 @@
 //
 // A local pack is declared by hand, never fingerprinted or seeded, so `detect`
 // and `marker` stay null; it activates from the `local/shouts-and-whispers`
-// token in .claudinite-checks.json.
+// token in .claudinite-settings.json.
 import crossTierConstants from './cross-tier-constants.mjs';
 import crossTierConstantCoverage from './cross-tier-constant-coverage.mjs';
 import geohashPrecisionParity from './geohash-precision-parity.mjs';
