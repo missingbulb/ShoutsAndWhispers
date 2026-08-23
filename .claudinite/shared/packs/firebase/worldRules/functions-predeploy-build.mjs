@@ -1,5 +1,5 @@
-import { finding } from '../../engine/checks/helpers/findings.mjs';
-import { functionsCodebases } from './lib.mjs';
+import { finding } from '../../../engine/checks/helpers/findings.mjs';
+import { functionsCodebases } from '../lib.mjs';
 
 // RULES.md §4: "Wire a predeploy build hook for functions … so a deploy can never
 // ship stale JS." The relevance gate is the build step itself — a codebase whose
