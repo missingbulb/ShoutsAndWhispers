@@ -5,7 +5,7 @@ This repo's own pack: the **cross-tier delivery contract** between the Flutter c
 compiler, analyzer, or test suite can see, and that fail silently when broken (no error, no
 red test, just messages delivered to nobody).
 
-Declared by hand as `local/shouts-and-whispers` in `.claudinite-checks.json`; never
+Declared by hand as `local/shouts-and-whispers` in `.claudinite-settings.json`; never
 fingerprinted (`detect`/`marker` are null). It deliberately holds nothing the canon already
 homes: `flutter`, `firebase`, `node`, `android`, `ios` own their platforms,
 `spec-driven-product` and `executable-requirements` own the loop and the spec harness.
