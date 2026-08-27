@@ -39,7 +39,7 @@
     },
     {
       "id": "basics",
-      "version": "60824.1"
+      "version": "60827.2"
     },
     {
       "id": "barriers",
@@ -50,11 +50,11 @@
     },
     {
       "id": "tidy-repo",
-      "version": "60824.1"
+      "version": "60827.2"
     },
     {
       "id": "claudinite-growth",
-      "version": "60824.1"
+      "version": "60827.1"
     },
     "local/shouts-and-whispers",
     {
@@ -73,7 +73,7 @@
     },
     {
       "id": "claudinite-tasks",
-      "version": "60824.9"
+      "version": "60827.5"
     }
   ],
   "accept": [
