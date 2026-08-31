@@ -39,7 +39,7 @@
     },
     {
       "id": "basics",
-      "version": "60830.6"
+      "version": "60831.3"
     },
     {
       "id": "barriers",
@@ -69,11 +69,11 @@
     },
     {
       "id": "claudinite-lifecycle",
-      "version": "60830.3"
+      "version": "60831.1"
     },
     {
       "id": "claudinite-tasks",
-      "version": "60831.3"
+      "version": "60831.5"
     }
   ],
   "accept": [
