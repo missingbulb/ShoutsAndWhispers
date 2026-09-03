@@ -26,7 +26,7 @@
     },
     {
       "id": "firebase",
-      "version": "60902.1"
+      "version": "60903.1"
     },
     {
       "id": "node",
@@ -39,7 +39,7 @@
     },
     {
       "id": "basics",
-      "version": "60902.6"
+      "version": "60903.5"
     },
     {
       "id": "barriers",
@@ -50,11 +50,11 @@
     },
     {
       "id": "tidy-repo",
-      "version": "60902.2"
+      "version": "60903.3"
     },
     {
       "id": "claudinite-growth",
-      "version": "60902.6"
+      "version": "60903.5"
     },
     "local/shouts-and-whispers",
     {
@@ -69,11 +69,11 @@
     },
     {
       "id": "claudinite-lifecycle",
-      "version": "60902.3"
+      "version": "60903.5"
     },
     {
       "id": "claudinite-tasks",
-      "version": "60902.9"
+      "version": "60903.4"
     }
   ],
   "accept": [
