@@ -2,11 +2,11 @@
   "packs": [
     {
       "id": "spec-driven-product",
-      "version": "60902.1"
+      "version": "60903.1"
     },
     {
       "id": "executable-requirements",
-      "version": "60902.1",
+      "version": "60903.1",
       "answers": {
         "ui_testing": "Flutter widget-test golden rendering — screen/saga/behavior/logic kinds under dev/requirements/, driven via `flutter test` (test/*_requirements_test.dart) or python3 run_requirements.py. screen and saga leaves assert a pixel-exact (or byte-identical APNG) golden the owner checks by sight; behavior/logic leaves assert coded expectations against the shipped app shell.",
         "requirements_source": "authored fresh at dev/requirements/requirements.md, porting the executable-requirements discipline from the GoogleCalendarEventCreator project to Flutter (dev/requirements/README.md)."
@@ -14,23 +14,23 @@
     },
     {
       "id": "flutter",
-      "version": "60902.1"
-    },
-    {
-      "id": "android",
-      "version": "60902.1"
-    },
-    {
-      "id": "ios",
-      "version": "60902.1"
-    },
-    {
-      "id": "firebase",
       "version": "60903.1"
     },
     {
+      "id": "android",
+      "version": "60903.1"
+    },
+    {
+      "id": "ios",
+      "version": "60903.1"
+    },
+    {
+      "id": "firebase",
+      "version": "60903.2"
+    },
+    {
       "id": "node",
-      "version": "60902.1",
+      "version": "60903.1",
       "config": {
         "dirs": [
           "firebase/functions"
@@ -39,14 +39,7 @@
     },
     {
       "id": "basics",
-      "version": "60903.5"
-    },
-    {
-      "id": "barriers",
-      "version": "60823.1",
-      "via": [
-        "basics"
-      ]
+      "version": "60904.3"
     },
     {
       "id": "tidy-repo",
@@ -54,7 +47,7 @@
     },
     {
       "id": "claudinite-growth",
-      "version": "60903.5"
+      "version": "60904.4"
     },
     "local/shouts-and-whispers",
     {
@@ -69,11 +62,11 @@
     },
     {
       "id": "claudinite-lifecycle",
-      "version": "60903.5"
+      "version": "60904.1"
     },
     {
       "id": "claudinite-tasks",
-      "version": "60903.4"
+      "version": "60904.2"
     }
   ],
   "accept": [
