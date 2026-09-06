@@ -141,3 +141,14 @@ belong in that review.
 The console's own cases run against fakes like any other suite. That its real replay works
 against a real backend is not something a golden can hold, and the console is itself the
 instrument for observing it.
+
+## Credentials
+
+The console is deployed publicly on the dev project's Hosting site, so the sim accounts'
+passwords are not in its bundle: the operator types them once and the browser keeps them.
+A visitor who finds the URL gets an empty console and no way to sign anything in.
+
+That is the whole protection, and it is sized to what it protects — the dev project, whose
+data is disposable by [ENVIRONMENTS.md](ENVIRONMENTS.md)'s contract. It would not be
+adequate for a project anyone depended on, which is a reason the console is never pointed
+at one.
