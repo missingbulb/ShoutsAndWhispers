@@ -42,6 +42,14 @@
       "version": "60906.3"
     },
     {
+      "id": "claudinite-lifecycle",
+      "version": "60906.3"
+    },
+    {
+      "id": "git-github",
+      "version": "60906.2"
+    },
+    {
       "id": "tidy-repo",
       "version": "60906.1"
     },
@@ -59,10 +67,6 @@
       "answers": {
         "store": "missingbulb/Shepherd"
       }
-    },
-    {
-      "id": "claudinite-lifecycle",
-      "version": "60906.3"
     },
     {
       "id": "claudinite-tasks",
