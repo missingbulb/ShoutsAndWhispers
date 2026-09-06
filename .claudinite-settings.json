@@ -39,15 +39,15 @@
     },
     {
       "id": "basics",
-      "version": "60904.3"
+      "version": "60906.3"
     },
     {
       "id": "tidy-repo",
-      "version": "60903.3"
+      "version": "60906.1"
     },
     {
       "id": "claudinite-growth",
-      "version": "60904.4"
+      "version": "60906.3"
     },
     "local/shouts-and-whispers",
     {
@@ -62,11 +62,11 @@
     },
     {
       "id": "claudinite-lifecycle",
-      "version": "60904.1"
+      "version": "60906.3"
     },
     {
       "id": "claudinite-tasks",
-      "version": "60904.2"
+      "version": "60906.5"
     }
   ],
   "accept": [
