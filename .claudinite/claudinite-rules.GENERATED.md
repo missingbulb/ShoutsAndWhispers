@@ -6,6 +6,7 @@
 @shared/packs/executable-requirements/RULES.md
 @shared/packs/firebase/RULES.md
 @shared/packs/flutter/RULES.md
+@shared/packs/ios/RULES.md
 @shared/packs/node/RULES.md
 @shared/packs/spec-driven-product/RULES.md
 @local/packs/shouts-and-whispers/RULES.md
