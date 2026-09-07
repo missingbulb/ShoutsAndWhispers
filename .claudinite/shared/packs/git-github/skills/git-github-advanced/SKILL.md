@@ -50,6 +50,13 @@ There's no cost to a branch carrying many commits when the project uses a **squa
 
 An automated prompt to commit the working tree (a stop-hook, a CI nag) tells you the tree is dirty — not that the changes are yours or intended. Before obeying, inspect what actually changed (`git status` / `git diff`): if it's environment/setup drift — a submodule pointer moved by `git submodule update` at clone time, a lockfile a setup script regenerated, generated artifacts — revert it rather than committing it onto your branch. Committing drift slips an unintended dependency or generated-file bump into an unrelated change.
 
+## Once a repo is confirmed templateless, stop searching for a PR template
+
+Tooling commonly instructs a search for `pull_request_template.md` before every
+`create_pull_request` call. In a repo that carries none, that is a guaranteed miss repeated on
+every PR. After the first miss, write the body from the commit message and skip the lookup for
+the rest of the session.
+
 ## Open a PR early when the reviewable artifact only exists on CI
 
 The default is to hold a PR until asked. Reverse that when a change's only reviewable output is produced by CI — an e2e/heavy-browser run, or a rendered artifact (a UI-snapshot pixel diff, a generated gallery) that can't be exercised in the local sandbox. Opening the PR is how the change is seen working and how failures surface, so doing it up front — rather than iterating locally first, which proves nothing for these classes — is the faster path to a working, reviewable result. Each CI iteration costs a full round-trip, so get the first one running as early as possible.
@@ -138,7 +145,7 @@ GitHub **Actions** reports results as **check runs**, not the legacy **commit st
 
 ## To confirm a non-PR run (push / dispatch), read its job logs — it has no PR check runs
 
-A `push` or `workflow_dispatch` run isn't attached to a PR, so the PR-scoped check-run query above doesn't apply to it. Confirm such a run through the GitHub API/MCP tools: `get_job_logs(run_id, failed_only: true)` — "0 failed jobs" means green — or, for a release build, `get_release_by_tag`. `get_job_logs` needs more than a bare `run_id`: it rejects with "job_id is required when failed_only is false" unless you pass `failed_only: true` or fetch a `job_id` first (`list_workflow_jobs`), and it 404s for a job still `in_progress` — wait for the job to finish. Don't `curl` the run's status instead: in a sandboxed session `api.github.com` is proxy-blocked and returns an error body that never matches a success pattern, so a `curl`/`Monitor` poll silently reports "still running" until it times out. The same error body fails the other way too: a loop deriving a pending-*count* from it reads the absent fields as zero pending and reports "all checks concluded" within a second, while the real checks are still `in_progress`. Verify any curl-based result against `get_check_runs` before acting on it.
+A `push` or `workflow_dispatch` run isn't attached to a PR, so the PR-scoped check-run query above doesn't apply to it. Confirm such a run through the GitHub API/MCP tools: `get_job_logs(run_id, failed_only: true)` — "0 failed jobs" means green — or, for a release build, `get_release_by_tag`. `get_job_logs` needs more than a bare `run_id`: it rejects with "job_id is required when failed_only is false" unless you pass `failed_only: true` or fetch a `job_id` first (`list_workflow_jobs`), and it 404s for a job still `in_progress` — wait for the job to finish. Don't `curl` the run's status instead: in a sandboxed session every repo-scoped `api.github.com` path 403s with an error body that never matches a success pattern, so a `curl`/`Monitor` poll silently reports "still running" until it times out. Reaching the host proves nothing — the unscoped `/rate_limit` answers 200 in the same session. The same error body fails the other way too: a loop deriving a pending-*count* from it reads the absent fields as zero pending and reports "all checks concluded" within a second, while the real checks are still `in_progress`. Verify any curl-based result against `get_check_runs` before acting on it.
 
 ## Waiting on a run or check: one mechanism, never two at once
 

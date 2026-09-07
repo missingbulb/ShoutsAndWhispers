@@ -14,7 +14,7 @@
     },
     {
       "id": "flutter",
-      "version": "60903.1"
+      "version": "60906.1"
     },
     {
       "id": "android",
@@ -22,7 +22,7 @@
     },
     {
       "id": "ios",
-      "version": "60903.1"
+      "version": "60906.1"
     },
     {
       "id": "firebase",
@@ -30,7 +30,7 @@
     },
     {
       "id": "node",
-      "version": "60903.1",
+      "version": "60906.2",
       "config": {
         "dirs": [
           "firebase/functions"
@@ -39,23 +39,19 @@
     },
     {
       "id": "basics",
-      "version": "60906.3"
+      "version": "60906.13"
     },
     {
       "id": "claudinite-lifecycle",
-      "version": "60906.3"
+      "version": "60907.1"
     },
     {
       "id": "git-github",
-      "version": "60906.2"
-    },
-    {
-      "id": "tidy-repo",
-      "version": "60906.1"
+      "version": "60906.4"
     },
     {
       "id": "claudinite-growth",
-      "version": "60906.3"
+      "version": "60907.2"
     },
     "local/shouts-and-whispers",
     {
@@ -70,7 +66,7 @@
     },
     {
       "id": "claudinite-tasks",
-      "version": "60906.5"
+      "version": "60907.2"
     }
   ],
   "accept": [
